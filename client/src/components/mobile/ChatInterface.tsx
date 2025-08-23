@@ -199,7 +199,7 @@ export function ChatInterface() {
 
   // Transform messages to our format
   useEffect(() => {
-    if (fetchedMessages) {
+    if (Array.isArray(fetchedMessages)) {
       const transformedMessages: Message[] = fetchedMessages.map((msg: any) => ({
         ...msg,
         type: msg.role === 'user' ? 'user' : 'ai',

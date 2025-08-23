@@ -5,6 +5,58 @@ import { NothingCard } from '@/components/mobile/NothingCard';
 import { Search, Filter, Clock, Signal, Star, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// Mock data for popular packs
+const popularPacks = [
+  {
+    id: 'popular-1',
+    title: 'JavaScript 기초',
+    description: '웹 개발의 핵심 언어 배우기',
+    category: 'javascript',
+    duration: 45,
+    rating: 4.8,
+  },
+  {
+    id: 'popular-2', 
+    title: 'React 입문',
+    description: '모던 웹 앱 개발하기',
+    category: 'react',
+    duration: 60,
+    rating: 4.7,
+  },
+  {
+    id: 'popular-3',
+    title: 'UI/UX 디자인',
+    description: '사용자 경험 디자인 원리',
+    category: 'design',
+    duration: 40,
+    rating: 4.6,
+  }
+];
+
+// Mock data for recommended packs
+const recommendedPacks = [
+  {
+    id: 'rec-1',
+    title: 'TypeScript 심화',
+    description: '타입 안전성으로 더 견고한 코드 작성',
+    category: 'javascript',
+    duration: 55,
+    difficulty: '중급',
+    matchRate: 95,
+    reason: '최근 JavaScript 학습 이력 기반 추천'
+  },
+  {
+    id: 'rec-2',
+    title: 'Python 데이터 분석',
+    description: 'pandas, matplotlib으로 데이터 시각화',
+    category: 'data',
+    duration: 70,
+    difficulty: '중급', 
+    matchRate: 88,
+    reason: '프로그래밍 실력 향상을 위한 맞춤 추천'
+  }
+];
+
 const categories = [
   { id: 'all', label: '전체', icon: '📚' },
   { id: 'javascript', label: 'JavaScript', icon: '💻' },
@@ -36,7 +88,7 @@ export default function Packs() {
     }],
   });
 
-  const filteredPacks = packs;
+  const filteredPacks = Array.isArray(packs) ? packs : [];
 
   return (
     <MobileLayout>
@@ -127,8 +179,75 @@ export default function Packs() {
         )}
       </section>
 
-      {/* Pack List */}
+      {/* Featured Sections */}
+      <section className="px-4 mb-8">
+        <h2 className="text-white font-semibold text-lg mb-4 flex items-center">
+          <Star className="mr-2 text-accent-warning" size={20} />
+          인기 학습팩
+        </h2>
+        <div className="flex space-x-4 overflow-x-auto pb-4">
+          {popularPacks.map((pack) => (
+            <div key={pack.id} className="flex-shrink-0 w-64">
+              <NothingCard
+                title={pack.title}
+                subtitle={pack.description}
+                icon={<span className="text-lg">{getPackIcon(pack.category)}</span>}
+                onTap={() => console.log('Popular pack selected:', pack.id)}
+                data-testid={`popular-pack-${pack.id}`}
+              >
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span className="flex items-center">
+                    <Clock size={10} className="mr-1" />
+                    {pack.duration}분
+                  </span>
+                  <span className="flex items-center text-accent-warning">
+                    <Star size={10} className="mr-1" />
+                    {pack.rating}
+                  </span>
+                </div>
+              </NothingCard>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="px-4 mb-8">
+        <h2 className="text-white font-semibold text-lg mb-4 flex items-center">
+          <Sparkles className="mr-2 text-accent-purple" size={20} />
+          AI 맞춤 추천
+        </h2>
+        <div className="space-y-3">
+          {recommendedPacks.map((pack) => (
+            <NothingCard
+              key={pack.id}
+              title={pack.title}
+              subtitle={pack.description}
+              icon={<span className="text-lg">{getPackIcon(pack.category)}</span>}
+              onTap={() => console.log('Recommended pack selected:', pack.id)}
+              data-testid={`recommended-pack-${pack.id}`}
+            >
+              <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                <span className="flex items-center">
+                  <Clock size={12} className="mr-1" />
+                  {pack.duration}분
+                </span>
+                <span className="flex items-center">
+                  <Signal size={12} className="mr-1" />
+                  {pack.difficulty}
+                </span>
+                <span className="text-accent-purple">
+                  {pack.matchRate}% 매치
+                </span>
+              </div>
+              <p className="text-xs text-accent-purple/70">{pack.reason}</p>
+            </NothingCard>
+          ))}
+        </div>
+      </section>
+
+      {/* All Packs List */}
       <section className="px-4 pb-8">
+        <h2 className="text-white font-semibold text-lg mb-4">모든 학습팩</h2>
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(6)].map((_, index) => (
