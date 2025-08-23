@@ -58,10 +58,10 @@ function EmptyState({ onQuickStart }: { onQuickStart: (message: string) => void 
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-6">
-      <div className="w-20 h-20 rounded-full mb-6" style={{
+      <div className="w-20 h-20 rounded-full mb-6 flex items-center justify-center" style={{
         background: `linear-gradient(135deg, var(--accent-purple), var(--accent-blue))`,
         boxShadow: `0 0 40px var(--nothing-glow)`
-      }} className="flex items-center justify-center">
+      }}>
         <GraduationCap className="w-10 h-10 text-white" />
       </div>
       
@@ -126,25 +126,25 @@ function MessageList({ messages, isLoading }: { messages: Message[], isLoading: 
       {/* Loading State */}
       {isLoading && (
         <div className="flex justify-start mb-4">
-          <div className="max-w-xs p-4 rounded-2xl chat-bubble-ai">
+          <div className="max-w-xs p-4 rounded-2xl chat-bubble-ai shimmer-border gradient-glow active">
             <div className="flex items-center space-x-2 mb-2">
               <div className="flex space-x-1">
-                <div className="w-2 h-2 rounded-full animate-pulse" style={{ 
+                <div className="w-2 h-2 rounded-full animate-pulse pulse-glow" style={{ 
                   backgroundColor: 'var(--accent-purple)', 
                   animationDelay: '0s' 
                 }}></div>
-                <div className="w-2 h-2 rounded-full animate-pulse" style={{ 
+                <div className="w-2 h-2 rounded-full animate-pulse pulse-glow" style={{ 
                   backgroundColor: 'var(--accent-blue)', 
                   animationDelay: '0.2s' 
                 }}></div>
-                <div className="w-2 h-2 rounded-full animate-pulse" style={{ 
+                <div className="w-2 h-2 rounded-full animate-pulse pulse-glow" style={{ 
                   backgroundColor: 'var(--accent-glow)', 
                   animationDelay: '0.4s' 
                 }}></div>
               </div>
             </div>
             <p className="text-xs" style={{ color: 'var(--accent-glow)' }}>
-              분석 중... (이해할 때까지 기다려주세요)
+              뇌파 분석 중... (Nothing™이 깊게 사고하는 중)
             </p>
           </div>
         </div>

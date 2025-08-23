@@ -189,25 +189,27 @@ export default function Packs() {
           {popularPacks.map((pack) => (
             <div key={pack.id} className="flex-shrink-0 w-64">
               <div className="transform hover:scale-105 transition-transform duration-300 origin-center">
-                <NothingCard
-                  title={pack.title}
-                  subtitle={pack.description}
-                  icon={<span className="text-lg">{getPackIcon(pack.category)}</span>}
-                  onTap={() => console.log('Popular pack selected:', pack.id)}
-                  data-testid={`popular-pack-${pack.id}`}
-                  className="hover:scale-100"
-                >
-                <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span className="flex items-center">
-                    <Clock size={10} className="mr-1" />
-                    {pack.duration}분
-                  </span>
-                  <span className="flex items-center text-accent-warning">
-                    <Star size={10} className="mr-1" />
-                    {pack.rating}
-                  </span>
+                <div className="gradient-glow click-effect">
+                  <NothingCard
+                    title={pack.title}
+                    subtitle={pack.description}
+                    icon={<span className="text-lg">{getPackIcon(pack.category)}</span>}
+                    onTap={() => console.log('Popular pack selected:', pack.id)}
+                    data-testid={`popular-pack-${pack.id}`}
+                    className="hover:scale-100"
+                  >
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span className="flex items-center">
+                        <Clock size={10} className="mr-1" />
+                        {pack.duration}분
+                      </span>
+                      <span className="flex items-center text-accent-warning">
+                        <Star size={10} className="mr-1" />
+                        {pack.rating}
+                      </span>
+                    </div>
+                  </NothingCard>
                 </div>
-                </NothingCard>
               </div>
             </div>
           ))}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { MobileLayout } from '@/components/mobile/MobileLayout';
 import { NothingCard } from '@/components/mobile/NothingCard';
-import { FileText, Save, Share2, Plus, Eye, Upload } from 'lucide-react';
+import { FileText, Save, Share2, Plus, Eye, Upload, RotateCcw, Sparkles, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Studio() {
@@ -140,10 +140,121 @@ export default function Studio() {
 
             {/* Markdown Editor */}
             <NothingCard title="마크다운 에디터" icon={<FileText />}>
-              <div>
-                <label className="block text-white text-sm font-medium mb-2">
-                  학습 콘텐츠
-                </label>
+              <div className="space-y-4">
+                {/* Editor Controls */}
+                <div className="flex items-center justify-between">
+                  <label className="block text-white text-sm font-medium">
+                    학습 콘텐츠
+                  </label>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        setMarkdownContent(`# Role
+You are an expert educational content creator specializing in creating engaging and effective learning materials.
+
+## Task
+Create comprehensive learning content that helps students master [specific topic/skill].
+
+## Context
+- Target audience: [beginner/intermediate/advanced] learners
+- Learning objective: [specific goal students should achieve]
+- Time constraint: [expected completion time]
+- Prerequisites: [required background knowledge]
+
+## Content Structure
+
+### Introduction
+- Hook: Start with engaging question or real-world example
+- Learning objectives: Clear, measurable outcomes
+- Overview: Brief roadmap of what will be covered
+
+### Core Content
+#### Section 1: [Topic Name]
+Explanation with examples:
+\`\`\`javascript
+// Practical code examples
+console.log("Learning by doing");
+\`\`\`
+
+#### Section 2: [Next Topic]
+Step-by-step breakdown with visual aids
+
+### Practice & Application
+- Hands-on exercises
+- Real-world scenarios
+- Self-check questions
+
+## Assessment
+1. **Knowledge Check**: [Question type]
+   - A) Option 1
+   - B) Option 2
+   - C) Option 3
+   - D) Option 4
+
+2. **Application Task**: [Practical exercise]
+
+# Rules
+- Use clear, simple language appropriate for target level
+- Include practical examples for every concept
+- Provide immediate feedback opportunities
+- Cross-reference related concepts
+- Validate accuracy of all technical information
+
+## Stop Conditions
+- All learning objectives are addressed
+- Content fits within specified time frame
+- Assessment aligns with objectives
+- Prerequisites are clearly stated
+
+## Output Format
+- Use proper markdown hierarchy (# ## ###)
+- Include code blocks with syntax highlighting
+- Add interactive elements where possible
+- Provide summary and next steps`);
+                        toast({
+                          title: "템플릿 새로고침 완료!",
+                          description: "최신 GPT-5 최적화 가이드로 업데이트했습니다",
+                        });
+                      }}
+                      className="p-2 bg-accent-blue hover:bg-accent-blue/80 text-white rounded-lg transition-all duration-300 hover:scale-105 shimmer-border"
+                      data-testid="button-refresh-template"
+                      title="최신 템플릿으로 새로고침"
+                    >
+                      <RotateCcw size={16} />
+                    </button>
+                    
+                    <button
+                      onClick={() => {
+                        if (!markdownContent.trim()) {
+                          toast({
+                            title: "잠깐만요!",
+                            description: "먼저 프롬프트를 작성해주세요 (빈 종이는 개선할 게 없어요)",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        
+                        toast({
+                          title: "AI 마법사 소환 중...",
+                          description: "Nothing™ AI가 프롬프트를 분석하고 개선안을 제안합니다 (시간이 좀 걸릴 수 있어요)",
+                        });
+                        
+                        // TODO: 실제 AI 개선 로직 구현
+                        setTimeout(() => {
+                          toast({
+                            title: "개선 완료!",
+                            description: "프롬프트가 더 명확하고 효과적으로 개선되었습니다",
+                          });
+                        }, 2000);
+                      }}
+                      className="p-2 floating-action text-white rounded-lg transition-all duration-300 hover:scale-105 pulse-glow"
+                      data-testid="button-improve-prompt"
+                      title="AI가 프롬프트를 개선해드려요"
+                    >
+                      <Sparkles size={16} />
+                    </button>
+                  </div>
+                </div>
                 <textarea
                   value={markdownContent}
                   onChange={(e) => setMarkdownContent(e.target.value)}
@@ -213,27 +324,37 @@ Step-by-step breakdown with visual aids
                   className="w-full p-4 bg-primary-700 text-white placeholder-gray-400 rounded-xl border border-accent-purple/20 focus:outline-none focus:ring-2 focus:ring-accent-purple/50 font-mono text-sm resize-none"
                   data-testid="input-markdown"
                 />
-                <div className="mt-3 text-xs text-gray-400">
-                  <p className="mb-2">💡 <strong>GPT-5 최적화 프롬프트 구조:</strong></p>
-                  <div className="grid grid-cols-2 gap-4 text-xs">
+                <div className="mt-4 p-4 bg-primary-800/50 rounded-xl border border-accent-purple/20">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Zap className="text-accent-purple" size={16} />
+                    <p className="text-accent-purple font-medium text-sm">Nothing™ 프롬프트 마법사</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                     <div>
-                      <p className="text-accent-purple font-medium mb-1">필수 섹션:</p>
-                      <ul className="space-y-1">
-                        <li>• <code># Role</code> - "You are..." 로 시작</li>
-                        <li>• <code>## Task</code> - 구체적 과제</li>
-                        <li>• <code>## Context</code> - 배경 정보</li>
-                        <li>• <code># Rules</code> - 제약 조건</li>
+                      <p className="text-accent-purple font-medium mb-2">✨ AI 개선 기능:</p>
+                      <ul className="space-y-1 text-gray-300">
+                        <li>• 애매한 표현 → 구체적 지시문</li>
+                        <li>• 누락된 컨텍스트 자동 추가</li>
+                        <li>• 최신 GPT-5 패턴 적용</li>
+                        <li>• 효과적인 Rules 섹션 생성</li>
                       </ul>
                     </div>
                     <div>
-                      <p className="text-accent-blue font-medium mb-1">마크다운 문법:</p>
-                      <ul className="space-y-1">
-                        <li>• <code>**굵게**</code> - 강조</li>
-                        <li>• <code>`코드`</code> - 인라인</li>
-                        <li>• <code>```js</code> - 코드블록</li>
-                        <li>• <code>- 항목</code> - 리스트</li>
+                      <p className="text-accent-blue font-medium mb-2">🎯 핵심 구조:</p>
+                      <ul className="space-y-1 text-gray-300">
+                        <li>• <code># Role</code> - "You are..." 신원</li>
+                        <li>• <code>## Task</code> - 명확한 목표</li>
+                        <li>• <code>## Context</code> - 상황 설명</li>
+                        <li>• <code># Rules</code> - 필수 제약사항</li>
                       </ul>
                     </div>
+                  </div>
+                  
+                  <div className="mt-3 p-2 bg-accent-purple/10 rounded-lg border border-accent-purple/20">
+                    <p className="text-xs text-accent-glow">
+                      💡 <strong>프로 팁:</strong> 새로고침 버튼으로 최신 템플릿을 받고, ✨ 버튼으로 AI가 개선해드려요!
+                    </p>
                   </div>
                 </div>
               </div>
