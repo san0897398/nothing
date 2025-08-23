@@ -5,22 +5,30 @@
 @tailwind utilities;
 
 :root {
-  /* 간소화된 Nothing™ 색상 팔레트 */
-  --bg-primary: #0f0f23;      /* 메인 배경 */
+  /* Nothing™ Deep Navy/Purple 색상 팔레트 */
+  --bg-primary: #0f0f23;      /* 메인 배경 (Nothing™ Deep Navy) */
   --bg-card: #1a1a3e;        /* 카드 배경 */
-  --bg-input: #1e1e40;       /* 입력창 배경 */
-  --accent-purple: #8b5cf6;   /* 액센트 색상 */
-  --accent-blue: #3b82f6;     /* 보조 액센트 */
+  --bg-input: #2d2d5f;       /* 입력창 배경 */
+  --accent-purple: #8b5cf6;   /* Nothing™ 퍼플 그라데이션 */
+  --accent-blue: #a78bfa;     /* Nothing™ 라이트 퍼플 */
+  --accent-glow: #c4b5fd;     /* Nothing™ 글로우 효과 */
   --text-primary: #ffffff;
   --text-secondary: #9ca3af;
   --border-subtle: rgba(139, 92, 246, 0.2);
+  --nothing-glow: rgba(199, 181, 253, 0.4);
   
   /* 레거시 호환성 */
   --bg-primary-900: #0f0f23;
   --bg-primary-800: #1a1a3e;
-  --bg-primary-700: #1e1e40;
+  --bg-primary-700: #2d2d5f;
   --accent-success: hsl(158, 78%, 39%);
   --accent-warning: hsl(43, 93%, 48%);
+  
+  /* Nothing™ 색상 매핑 */
+  --primary-900: #0f0f23;
+  --primary-800: #1a1a3e;
+  --primary-700: #2d2d5f;
+  --primary-600: #4338ca;
   
   /* Interactive Elements */
   --border-subtle: hsla(258, 84%, 68%, 0.2);

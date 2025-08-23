@@ -275,15 +275,15 @@ Step-by-step breakdown with visual aids
             <NothingCard title="AI 피드백" icon={<FileText />}>
               <div className="text-center space-y-4">
                 <p className="text-gray-400 text-sm">
-                  AI가 콘텐츠를 분석하고 개선 방안을 제안합니다
+                  Nothing™ AI가 콘텐츠를 심층 분석합니다
                 </p>
                 <button 
-                  className="w-full py-3 bg-accent-purple text-white rounded-xl font-medium hover:bg-accent-purple/80 transition-colors"
+                  className="w-full py-3 floating-action text-white rounded-xl font-medium transition-all duration-300 hover:scale-105"
                   disabled={!markdownContent.trim()}
                   data-testid="button-ai-feedback"
                   onClick={() => toast({
-                    title: "AI 피드백",
-                    description: "콘텐츠 분석 중입니다...",
+                    title: "뇌에 업로드 중...",
+                    description: "학습 효과를 최적화하는 중입니다 (시간이 좀 걸릴 수 있어요)",
                   })}
                 >
                   AI 피드백 받기

@@ -320,9 +320,9 @@ export default function Packs() {
         ) : (
           <div className="text-center py-12">
             <Sparkles className="mx-auto mb-4 text-gray-500" size={48} />
-            <h3 className="text-white font-medium mb-2">검색 결과가 없습니다</h3>
+            <h3 className="text-white font-medium mb-2">Absolutely Nothing™</h3>
             <p className="text-gray-400 text-sm mb-4">
-              다른 키워드나 필터로 시도해보세요
+              검색 결과가 없습니다... (이런 건 처음이에요)
             </p>
             <button
               onClick={() => {
@@ -330,9 +330,9 @@ export default function Packs() {
                 setSelectedCategory('all');
                 setSelectedDifficulty('all');
               }}
-              className="px-4 py-2 bg-accent-purple text-white rounded-lg text-sm hover:bg-accent-purple/80 transition-colors"
+              className="floating-action px-4 py-2 text-white rounded-lg text-sm transition-all duration-300 hover:scale-105"
             >
-              필터 초기화
+              필터 리셋 (마법 같이)
             </button>
           </div>
         )}

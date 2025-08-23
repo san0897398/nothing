@@ -19,14 +19,16 @@ interface Message {
 // MinimalHeader 컴포넌트 (44px)
 function MinimalHeader() {
   return (
-    <div className="flex items-center justify-between px-4 py-3 bg-slate-900/80 backdrop-blur-sm border-b border-purple-500/10">
+    <div className="flex items-center justify-between px-4 py-3 glassmorphism border-b border-subtle">
       <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-purple to-accent-blue flex items-center justify-center" style={{
+          background: `linear-gradient(135deg, var(--accent-purple), var(--accent-blue))`
+        }}>
           <Bot className="w-5 h-5 text-white" />
         </div>
         <div>
           <h1 className="text-white font-semibold text-lg">AI 학습 도우미</h1>
-          <p className="text-purple-400 text-xs">온라인</p>
+          <p className="text-xs" style={{ color: 'var(--accent-glow)' }}>지식을 업로드 중...</p>
         </div>
       </div>
     </div>
@@ -35,24 +37,50 @@ function MinimalHeader() {
 
 // EmptyState 컴포넌트 
 function EmptyState({ onQuickStart }: { onQuickStart: (message: string) => void }) {
+  const [loadingText, setLoadingText] = useState('지식 데이터베이스 로딩 중...');
+  
+  useEffect(() => {
+    const messages = [
+      '지식 데이터베이스 로딩 중...',
+      '뇌파 동조화 완료',
+      '학습 모드 활성화',
+      '지식을 전송할 준비 완료'
+    ];
+    
+    let index = 0;
+    const interval = setInterval(() => {
+      index = (index + 1) % messages.length;
+      setLoadingText(messages[index]);
+    }, 2000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center h-full px-6">
-      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center mb-6">
+      <div className="w-20 h-20 rounded-full mb-6" style={{
+        background: `linear-gradient(135deg, var(--accent-purple), var(--accent-blue))`,
+        boxShadow: `0 0 40px var(--nothing-glow)`
+      }} className="flex items-center justify-center">
         <GraduationCap className="w-10 h-10 text-white" />
       </div>
       
       <h2 className="text-2xl font-bold mb-4 text-center">
-        <span className="text-white">AI 학습</span>
-        <span className="gradient-text"> 도우미</span>
+        <span className="text-white">Absolutely</span>
+        <span className="gradient-text"> Nothing™</span>
       </h2>
       
+      <p className="text-xs mb-2" style={{ color: 'var(--accent-glow)' }}>
+        {loadingText}
+      </p>
+      
       <p className="text-gray-400 text-center mb-8 max-w-sm">
-        궁금한 것이 있으면 언제든 물어보세요!
+        깊이 있는 학습 경험을 위한 AI 어시스턴트입니다.
       </p>
       
       <button 
         onClick={() => onQuickStart("안녕하세요!")}
-        className="px-6 py-3 bg-purple-500 text-white rounded-2xl hover:bg-purple-600 transition-colors"
+        className="floating-action px-6 py-3 text-white rounded-2xl font-medium transition-all duration-300 hover:scale-105"
         data-testid="button-quick-start"
       >
         대화 시작하기
@@ -65,10 +93,10 @@ function EmptyState({ onQuickStart }: { onQuickStart: (message: string) => void 
 function MessageBubble({ message }: { message: Message }) {
   return (
     <div className={`flex ${message.type === 'ai' ? 'justify-start' : 'justify-end'} mb-4`}>
-      <div className={`max-w-[85%] p-4 rounded-2xl ${
+      <div className={`max-w-[85%] p-4 rounded-2xl transition-all duration-300 ${
         message.type === 'ai' 
-          ? 'bg-slate-800 border border-purple-500/20 text-white' 
-          : 'bg-purple-500 text-white'
+          ? 'chat-bubble-ai text-white' 
+          : 'chat-bubble-user text-white'
       }`}>
         <p className="leading-relaxed">{message.content}</p>
         <div className="mt-2 text-xs opacity-70">
@@ -98,12 +126,26 @@ function MessageList({ messages, isLoading }: { messages: Message[], isLoading: 
       {/* Loading State */}
       {isLoading && (
         <div className="flex justify-start mb-4">
-          <div className="max-w-xs p-4 rounded-2xl bg-slate-800 border border-purple-500/20">
-            <div className="flex space-x-1">
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+          <div className="max-w-xs p-4 rounded-2xl chat-bubble-ai">
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ 
+                  backgroundColor: 'var(--accent-purple)', 
+                  animationDelay: '0s' 
+                }}></div>
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ 
+                  backgroundColor: 'var(--accent-blue)', 
+                  animationDelay: '0.2s' 
+                }}></div>
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ 
+                  backgroundColor: 'var(--accent-glow)', 
+                  animationDelay: '0.4s' 
+                }}></div>
+              </div>
             </div>
+            <p className="text-xs" style={{ color: 'var(--accent-glow)' }}>
+              분석 중... (이해할 때까지 기다려주세요)
+            </p>
           </div>
         </div>
       )}
@@ -125,55 +167,47 @@ function ChatInput({
 }: {
   message: string;
   showFileInput: boolean;
-  onMessageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onMessageChange: (value: string) => void;
+  onKeyDown: (e: React.KeyboardEvent) => void;
   onSendMessage: () => void;
   onToggleFileInput: () => void;
-  disabled: boolean;
+  disabled?: boolean;
 }) {
   return (
-    <div className="p-4 bg-slate-900/95 backdrop-blur-sm border-t border-purple-500/20">
-      {/* File Input (토글 방식) */}
-      {showFileInput && (
-        <div className="mb-3 p-3 bg-slate-800 rounded-xl">
-          <input type="file" multiple className="w-full text-white text-sm" />
-        </div>
-      )}
-      
+    <div className="p-4 bg-slate-900/90 backdrop-blur-sm border-t border-purple-500/10 mobile-safe-area">
       <div className="flex items-end space-x-3">
-        {/* File Button */}
         <button
           onClick={onToggleFileInput}
-          className="p-3 bg-slate-800 text-purple-400 rounded-full hover:bg-purple-500/20 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
-          data-testid="button-toggle-file"
+          className={`p-3 rounded-full transition-all ${
+            showFileInput
+              ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30'
+              : 'bg-slate-700 text-gray-400 hover:bg-slate-600'
+          }`}
+          data-testid="button-file-input"
         >
-          <Plus className="w-5 h-5" />
+          <Plus size={20} />
         </button>
         
-        {/* Text Input */}
         <div className="flex-1 relative">
-          <input
-            type="text"
+          <textarea
             value={message}
-            onChange={onMessageChange}
+            onChange={(e) => onMessageChange(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="메시지를 입력하세요..."
-            className="w-full bg-slate-800 border border-purple-500/30 rounded-2xl px-4 py-3 pr-12 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
+            className="w-full p-4 pr-12 bg-slate-800 text-white placeholder-gray-400 rounded-2xl border border-purple-500/20 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none mobile-text-base"
             style={{ fontSize: '16px' }}
+            rows={1}
+            disabled={disabled}
             data-testid="input-message"
           />
           
           <button
             onClick={onSendMessage}
-            disabled={!message.trim() || disabled}
-            className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-colors ${
-              message.trim() && !disabled
-                ? 'bg-purple-500 hover:bg-purple-600 text-white' 
-                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-            }`}
+            disabled={disabled || !message.trim()}
+            className="absolute right-2 bottom-2 p-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             data-testid="button-send"
           >
-            <Send className="w-5 h-5" />
+            <Send size={16} />
           </button>
         </div>
       </div>
@@ -181,18 +215,17 @@ function ChatInput({
   );
 }
 
-// 전체 화면 채팅 컨테이너
+// Main ChatInterface Component
 export function ChatInterface() {
-  const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
   const [showFileInput, setShowFileInput] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
-  // Fetch chat messages
-  const { data: fetchedMessages = [] } = useQuery({
+  // Fetch existing messages
+  const { data: fetchedMessages, isLoading: messagesLoading } = useQuery({
     queryKey: ['/api/chat-messages'],
     enabled: isAuthenticated,
   });
@@ -213,88 +246,70 @@ export function ChatInterface() {
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: async (messageText: string) => {
-      setIsLoading(true);
       return apiRequest('POST', '/api/chat-messages', { message: messageText });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/chat-messages'] });
       setMessage('');
-      setIsLoading(false);
     },
     onError: (error) => {
-      setIsLoading(false);
       if (isUnauthorizedError(error)) {
         toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
+          title: "로그인 필요",
+          description: "채팅을 사용하려면 로그인해주세요.",
           variant: "destructive",
         });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
         return;
       }
+      
       toast({
-        title: "Error",
-        description: "Failed to send message",
+        title: "오류 발생",
+        description: "메시지 전송에 실패했습니다.",
         variant: "destructive",
       });
     },
   });
 
-  // Handle quick start
-  const handleQuickStart = (quickMessage: string) => {
-    setMessage(quickMessage);
-    handleSendMessage(quickMessage);
+  const handleSendMessage = () => {
+    if (!message.trim() || sendMessageMutation.isPending) return;
+    
+    sendMessageMutation.mutate(message);
   };
 
-  // Handle send message
-  const handleSendMessage = (messageText?: string) => {
-    const textToSend = messageText || message.trim();
-    if (textToSend && !sendMessageMutation.isPending) {
-      sendMessageMutation.mutate(textToSend);
-    }
-  };
-
-  // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(e.target.value);
-  };
-
-  // Handle key press
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
-  // Show loading state while authenticating
-  if (!isAuthenticated) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-b from-slate-900 to-slate-800">
-        <div className="text-center">
-          <Bot className="mx-auto mb-4 text-purple-400" size={32} />
-          <p className="text-gray-400">로그인이 필요합니다.</p>
-        </div>
-      </div>
-    );
-  }
+  const handleQuickStart = (quickMessage: string) => {
+    setMessage(quickMessage);
+    setTimeout(() => handleSendMessage(), 100);
+  };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+    <div className="h-screen flex flex-col">
+      {/* Header */}
       <MinimalHeader />
+      
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto">
-        {messages.length === 0 ? (
+        {messages.length === 0 && !messagesLoading ? (
           <EmptyState onQuickStart={handleQuickStart} />
         ) : (
-          <MessageList messages={messages} isLoading={isLoading} />
+          <MessageList 
+            messages={messages} 
+            isLoading={sendMessageMutation.isPending}
+          />
         )}
       </div>
-      <ChatInput 
+      
+      {/* Input */}
+      <ChatInput
         message={message}
         showFileInput={showFileInput}
-        onMessageChange={handleInputChange}
+        onMessageChange={setMessage}
         onKeyDown={handleKeyDown}
         onSendMessage={handleSendMessage}
         onToggleFileInput={() => setShowFileInput(!showFileInput)}
