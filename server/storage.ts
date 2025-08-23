@@ -91,9 +91,9 @@ export class DatabaseStorage implements IStorage {
   }): Promise<LearningPack[]> {
     const { category, difficulty, search, limit = 20, offset = 0 } = params || {};
     
-    let query = db.select().from(learningPacks).where(eq(learningPacks.isPublic, true));
+    let query = db.select().from(learningPacks);
     
-    const conditions = [];
+    const conditions = [eq(learningPacks.isPublic, true)];
     
     if (category) {
       conditions.push(eq(learningPacks.category, category));
@@ -112,9 +112,7 @@ export class DatabaseStorage implements IStorage {
       );
     }
     
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    query = query.where(and(...conditions));
     
     return query
       .orderBy(desc(learningPacks.createdAt))
@@ -143,14 +141,14 @@ export class DatabaseStorage implements IStorage {
 
   async deleteLearningPack(id: number): Promise<boolean> {
     const result = await db.delete(learningPacks).where(eq(learningPacks.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async getUserProgress(userId: string, packId?: number): Promise<UserProgress[]> {
     let query = db.select().from(userProgress).where(eq(userProgress.userId, userId));
     
     if (packId) {
-      query = query.where(and(eq(userProgress.userId, userId), eq(userProgress.packId, packId)));
+      query = db.select().from(userProgress).where(and(eq(userProgress.userId, userId), eq(userProgress.packId, packId)));
     }
     
     return query.orderBy(desc(userProgress.lastAccessedAt));
@@ -297,7 +295,7 @@ export class DatabaseStorage implements IStorage {
         )
       );
 
-    const categories = [...new Set(completedPacks.map(p => p.category))];
+    const categories = Array.from(new Set(completedPacks.map(p => p.category).filter(Boolean)));
 
     // Return packs from similar categories, excluding already completed ones
     return db
