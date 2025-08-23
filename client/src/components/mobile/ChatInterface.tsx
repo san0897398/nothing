@@ -1,59 +1,228 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Upload, Save, Download, MoreVertical, Bot, User } from 'lucide-react';
+import { Send, Bot, GraduationCap, Plus } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import { ObjectUploader } from '@/components/ObjectUploader';
-import { cn } from '@/lib/utils';
 import { isUnauthorizedError } from '@/lib/auth-utils';
-import type { UploadResult } from '@uppy/core';
 
-interface ChatMessage {
+interface Message {
   id: number;
   message: string;
   role: 'user' | 'assistant';
   createdAt: string;
-  metadata?: {
-    suggestions?: string[];
-    actions?: Array<{
-      type: 'upload' | 'save' | 'export' | 'navigate';
-      label: string;
-      data?: any;
-    }>;
-  };
+  type: 'user' | 'ai';
+  content: string;
+  timestamp: string;
 }
 
+// MinimalHeader 컴포넌트 (44px)
+function MinimalHeader() {
+  return (
+    <div className="flex items-center justify-between px-4 py-3 bg-slate-900/80 backdrop-blur-sm border-b border-purple-500/10">
+      <div className="flex items-center space-x-3">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+          <Bot className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h1 className="text-white font-semibold text-lg">AI 학습 도우미</h1>
+          <p className="text-purple-400 text-xs">온라인</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// EmptyState 컴포넌트 
+function EmptyState({ onQuickStart }: { onQuickStart: (message: string) => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-full px-6">
+      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center mb-6">
+        <GraduationCap className="w-10 h-10 text-white" />
+      </div>
+      
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        <span className="text-white">AI 학습</span>
+        <span className="gradient-text"> 도우미</span>
+      </h2>
+      
+      <p className="text-gray-400 text-center mb-8 max-w-sm">
+        궁금한 것이 있으면 언제든 물어보세요!
+      </p>
+      
+      <button 
+        onClick={() => onQuickStart("안녕하세요!")}
+        className="px-6 py-3 bg-purple-500 text-white rounded-2xl hover:bg-purple-600 transition-colors"
+        data-testid="button-quick-start"
+      >
+        대화 시작하기
+      </button>
+    </div>
+  );
+}
+
+// MessageBubble 컴포넌트
+function MessageBubble({ message }: { message: Message }) {
+  return (
+    <div className={`flex ${message.type === 'ai' ? 'justify-start' : 'justify-end'} mb-4`}>
+      <div className={`max-w-[85%] p-4 rounded-2xl ${
+        message.type === 'ai' 
+          ? 'bg-slate-800 border border-purple-500/20 text-white' 
+          : 'bg-purple-500 text-white'
+      }`}>
+        <p className="leading-relaxed">{message.content}</p>
+        <div className="mt-2 text-xs opacity-70">
+          {new Date(message.timestamp).toLocaleTimeString('ko-KR', {
+            hour: '2-digit', minute: '2-digit'
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// MessageList 컴포넌트 
+function MessageList({ messages, isLoading }: { messages: Message[], isLoading: boolean }) {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  return (
+    <div className="p-4 space-y-2">
+      {messages.map((msg) => (
+        <MessageBubble key={msg.id} message={msg} />
+      ))}
+      
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex justify-start mb-4">
+          <div className="max-w-xs p-4 rounded-2xl bg-slate-800 border border-purple-500/20">
+            <div className="flex space-x-1">
+              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div ref={messagesEndRef} />
+    </div>
+  );
+}
+
+// ChatInput 컴포넌트
+function ChatInput({ 
+  message, 
+  showFileInput, 
+  onMessageChange, 
+  onKeyDown, 
+  onSendMessage, 
+  onToggleFileInput,
+  disabled 
+}: {
+  message: string;
+  showFileInput: boolean;
+  onMessageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onSendMessage: () => void;
+  onToggleFileInput: () => void;
+  disabled: boolean;
+}) {
+  return (
+    <div className="p-4 bg-slate-900/95 backdrop-blur-sm border-t border-purple-500/20">
+      {/* File Input (토글 방식) */}
+      {showFileInput && (
+        <div className="mb-3 p-3 bg-slate-800 rounded-xl">
+          <input type="file" multiple className="w-full text-white text-sm" />
+        </div>
+      )}
+      
+      <div className="flex items-end space-x-3">
+        {/* File Button */}
+        <button
+          onClick={onToggleFileInput}
+          className="p-3 bg-slate-800 text-purple-400 rounded-full hover:bg-purple-500/20 transition-colors min-w-[48px] min-h-[48px] flex items-center justify-center"
+          data-testid="button-toggle-file"
+        >
+          <Plus className="w-5 h-5" />
+        </button>
+        
+        {/* Text Input */}
+        <div className="flex-1 relative">
+          <input
+            type="text"
+            value={message}
+            onChange={onMessageChange}
+            onKeyDown={onKeyDown}
+            placeholder="메시지를 입력하세요..."
+            className="w-full bg-slate-800 border border-purple-500/30 rounded-2xl px-4 py-3 pr-12 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
+            style={{ fontSize: '16px' }}
+            data-testid="input-message"
+          />
+          
+          <button
+            onClick={onSendMessage}
+            disabled={!message.trim() || disabled}
+            className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-xl transition-colors ${
+              message.trim() && !disabled
+                ? 'bg-purple-500 hover:bg-purple-600 text-white' 
+                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+            }`}
+            data-testid="button-send"
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 전체 화면 채팅 컨테이너
 export function ChatInterface() {
   const [message, setMessage] = useState('');
-  const [isThinking, setIsThinking] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showFileInput, setShowFileInput] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   // Fetch chat messages
-  const { data: messages = [] } = useQuery({
+  const { data: fetchedMessages = [] } = useQuery({
     queryKey: ['/api/chat-messages'],
     enabled: isAuthenticated,
   });
 
+  // Transform messages to our format
+  useEffect(() => {
+    if (fetchedMessages) {
+      const transformedMessages: Message[] = fetchedMessages.map((msg: any) => ({
+        ...msg,
+        type: msg.role === 'user' ? 'user' : 'ai',
+        content: msg.message,
+        timestamp: msg.createdAt,
+      }));
+      setMessages(transformedMessages);
+    }
+  }, [fetchedMessages]);
+
   // Send message mutation
   const sendMessageMutation = useMutation({
     mutationFn: async (messageText: string) => {
+      setIsLoading(true);
       return apiRequest('POST', '/api/chat-messages', { message: messageText });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/chat-messages'] });
       setMessage('');
-      setIsThinking(false);
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
-      }
+      setIsLoading(false);
     },
     onError: (error) => {
-      setIsThinking(false);
+      setIsLoading(false);
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -73,268 +242,64 @@ export function ChatInterface() {
     },
   });
 
-  const handleSendMessage = () => {
-    const trimmedMessage = message.trim();
-    if (!trimmedMessage || sendMessageMutation.isPending) return;
-
-    setIsThinking(true);
-    sendMessageMutation.mutate(trimmedMessage);
+  // Handle quick start
+  const handleQuickStart = (quickMessage: string) => {
+    setMessage(quickMessage);
+    handleSendMessage(quickMessage);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+  // Handle send message
+  const handleSendMessage = (messageText?: string) => {
+    const textToSend = messageText || message.trim();
+    if (textToSend && !sendMessageMutation.isPending) {
+      sendMessageMutation.mutate(textToSend);
+    }
+  };
+
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
+  };
+
+  // Handle key press
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
-  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value);
-    
-    // Auto-resize textarea
-    const textarea = e.target;
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
-  };
-
-  const handleGetUploadParameters = async () => {
-    const response = await apiRequest('POST', '/api/objects/upload');
-    const data = await response.json();
-    return {
-      method: 'PUT' as const,
-      url: data.uploadURL,
-    };
-  };
-
-  const handleUploadComplete = async (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-    try {
-      if (result.successful.length > 0) {
-        const file = result.successful[0];
-        await apiRequest('PUT', '/api/file-uploads', {
-          uploadURL: file.uploadURL,
-          filename: file.name,
-          originalName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-        });
-        
-        toast({
-          title: "파일 업로드 성공",
-          description: `${file.name}이(가) 성공적으로 업로드되었습니다.`,
-        });
-
-        queryClient.invalidateQueries({ queryKey: ['/api/chat-messages'] });
-      }
-    } catch (error) {
-      console.error('Upload completion error:', error);
-      toast({
-        title: "업로드 오류",
-        description: "파일 처리 중 오류가 발생했습니다.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleSaveProgress = () => {
-    // TODO: Implement save progress logic
-    toast({
-      title: "진도 저장됨",
-      description: "현재 학습 진도가 저장되었습니다.",
-    });
-  };
-
-  const handleExportResults = () => {
-    // TODO: Implement export logic
-    toast({
-      title: "결과 내보내기",
-      description: "학습 결과를 내보내는 중...",
-    });
-  };
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isThinking]);
-
+  // Show loading state while authenticating
   if (!isAuthenticated) {
     return (
-      <div className="nothing-card rounded-2xl p-6 text-center">
-        <p className="text-gray-400 mb-4">채팅을 사용하려면 로그인이 필요합니다.</p>
-        <button 
-          onClick={() => window.location.href = '/api/login'}
-          className="px-4 py-2 bg-accent-purple text-white rounded-lg"
-        >
-          로그인
-        </button>
+      <div className="flex items-center justify-center h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+        <div className="text-center">
+          <Bot className="mx-auto mb-4 text-purple-400" size={32} />
+          <p className="text-gray-400">로그인이 필요합니다.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full px-4">
-      <div className="nothing-card rounded-2xl overflow-hidden flex flex-col flex-1 min-h-0" data-testid="chat-interface">
-        {/* Chat Header */}
-        <div className="p-4 border-b border-accent-purple/20 flex-shrink-0">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-purple to-accent-blue flex items-center justify-center">
-              <Bot className="text-white" size={20} />
-            </div>
-            <div>
-              <h3 className="text-white font-semibold">AI 학습 도우미</h3>
-              <p className="text-gray-400 text-xs">온라인 • 즉시 응답</p>
-            </div>
-            <div className="ml-auto">
-              <button className="w-8 h-8 rounded-full bg-accent-purple/20 text-accent-purple flex items-center justify-center hover:bg-accent-purple/30 transition-colors">
-                <MoreVertical size={14} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Chat Messages */}
-        <div className="p-4 space-y-4 flex-1 overflow-y-auto">
-          {messages.length === 0 ? (
-            <div className="text-center text-gray-400 py-8">
-              <Bot className="mx-auto mb-4" size={32} />
-              <p>안녕하세요! 궁금한 것이 있으면 언제든 물어보세요.</p>
-            </div>
-          ) : (
-            messages.map((msg: ChatMessage) => (
-              <ChatMessage key={msg.id} message={msg} />
-            ))
-          )}
-          
-          {/* AI Thinking Indicator */}
-          {isThinking && (
-            <div className="flex items-start space-x-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-purple to-accent-blue flex items-center justify-center flex-shrink-0">
-                <Bot size={14} className="text-white" />
-              </div>
-              <div className="chat-bubble-ai p-3 rounded-2xl rounded-tl-md">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-accent-purple rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-accent-purple rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                  <div className="w-2 h-2 bg-accent-purple rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
-                  <span className="text-gray-400 text-xs ml-2">답변을 준비중...</span>
-                </div>
-              </div>
-            </div>
-          )}
-          
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Chat Input with Actions */}
-        <div className="p-4 border-t border-accent-purple/20 flex-shrink-0">
-          {/* Action Buttons */}
-          <div className="flex space-x-2 mb-4">
-            <ObjectUploader
-              maxNumberOfFiles={1}
-              maxFileSize={10485760} // 10MB
-              onGetUploadParameters={handleGetUploadParameters}
-              onComplete={handleUploadComplete}
-              buttonClassName="flex-1 py-2 px-3 bg-accent-blue/20 text-accent-blue rounded-lg text-xs font-medium hover:bg-accent-blue/30 transition-colors"
-            >
-              <Upload size={14} className="mr-1" />
-              파일 업로드
-            </ObjectUploader>
-            
-            <button 
-              onClick={handleSaveProgress}
-              className="flex-1 py-2 px-3 bg-accent-success/20 text-accent-success rounded-lg text-xs font-medium hover:bg-accent-success/30 transition-colors"
-              data-testid="button-save-progress"
-            >
-              <Save size={14} className="mr-1" />
-              진도 저장
-            </button>
-            
-            <button 
-              onClick={handleExportResults}
-              className="flex-1 py-2 px-3 bg-accent-warning/20 text-accent-warning rounded-lg text-xs font-medium hover:bg-accent-warning/30 transition-colors"
-              data-testid="button-export-results"
-            >
-              <Download size={14} className="mr-1" />
-              결과 내보내기
-            </button>
-          </div>
-
-          {/* Message Input */}
-          <div className="flex items-end space-x-3">
-            <div className="flex-1">
-              <textarea 
-                ref={textareaRef}
-                value={message}
-                onChange={handleTextareaChange}
-                onKeyPress={handleKeyPress}
-                placeholder="메시지를 입력하세요..."
-                className="w-full p-3 bg-primary-700 text-white placeholder-gray-400 rounded-xl border border-accent-purple/20 resize-none focus:outline-none focus:ring-2 focus:ring-accent-purple/50 mobile-text-base"
-                rows={1}
-                style={{ fontSize: '16px', minHeight: '44px' }}
-                data-testid="input-message"
-              />
-            </div>
-            <button 
-              onClick={handleSendMessage}
-              disabled={!message.trim() || sendMessageMutation.isPending}
-              className={cn(
-                "floating-action w-12 h-12 rounded-xl flex items-center justify-center text-white transition-all",
-                (!message.trim() || sendMessageMutation.isPending) && "opacity-50 cursor-not-allowed"
-              )}
-              data-testid="button-send"
-            >
-              <Send size={20} />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ChatMessage({ message }: { message: ChatMessage }) {
-  const isAI = message.role === 'assistant';
-  
-  return (
-    <div className={cn(
-      "flex items-start space-x-3",
-      !isAI && "flex-row-reverse space-x-reverse"
-    )}>
-      <div className={cn(
-        "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-        isAI 
-          ? "bg-gradient-to-br from-accent-purple to-accent-blue"
-          : "bg-accent-purple"
-      )}>
-        {isAI ? (
-          <Bot size={14} className="text-white" />
+    <div className="flex flex-col h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+      <MinimalHeader />
+      <div className="flex-1 overflow-y-auto">
+        {messages.length === 0 ? (
+          <EmptyState onQuickStart={handleQuickStart} />
         ) : (
-          <User size={14} className="text-white" />
+          <MessageList messages={messages} isLoading={isLoading} />
         )}
       </div>
-      
-      <div className={cn(
-        "max-w-[80%] p-3 rounded-2xl",
-        isAI 
-          ? "chat-bubble-ai rounded-tl-md" 
-          : "chat-bubble-user rounded-tr-md"
-      )}>
-        <p className="text-white text-sm leading-relaxed whitespace-pre-wrap">
-          {message.message}
-        </p>
-        
-        {isAI && message.metadata?.actions && message.metadata.actions.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {message.metadata.actions.map((action, index) => (
-              <button
-                key={index}
-                className="px-3 py-1 bg-accent-purple/20 text-accent-purple text-xs rounded-lg hover:bg-accent-purple/30 transition-colors"
-                data-testid={`action-${action.type}`}
-              >
-                {action.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <ChatInput 
+        message={message}
+        showFileInput={showFileInput}
+        onMessageChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        onSendMessage={handleSendMessage}
+        onToggleFileInput={() => setShowFileInput(!showFileInput)}
+        disabled={sendMessageMutation.isPending}
+      />
     </div>
   );
 }

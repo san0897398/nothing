@@ -5,22 +5,22 @@
 @tailwind utilities;
 
 :root {
-  /* Nothing™ Design System Colors */
-  --bg-primary-900: hsl(240, 50%, 8%);
-  --bg-primary-800: hsl(240, 40%, 12%);
-  --bg-primary-700: hsl(240, 30%, 20%);
-  --bg-primary-600: hsl(240, 25%, 30%);
+  /* 간소화된 Nothing™ 색상 팔레트 */
+  --bg-primary: #0f0f23;      /* 메인 배경 */
+  --bg-card: #1a1a3e;        /* 카드 배경 */
+  --bg-input: #1e1e40;       /* 입력창 배경 */
+  --accent-purple: #8b5cf6;   /* 액센트 색상 */
+  --accent-blue: #3b82f6;     /* 보조 액센트 */
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --border-subtle: rgba(139, 92, 246, 0.2);
   
-  /* Learning Gradients */
-  --accent-purple: hsl(258, 84%, 68%);
-  --accent-blue: hsl(218, 89%, 59%);
+  /* 레거시 호환성 */
+  --bg-primary-900: #0f0f23;
+  --bg-primary-800: #1a1a3e;
+  --bg-primary-700: #1e1e40;
   --accent-success: hsl(158, 78%, 39%);
   --accent-warning: hsl(43, 93%, 48%);
-  
-  /* Text Colors */
-  --text-primary: hsl(0, 0%, 100%);
-  --text-secondary: hsl(220, 14%, 65%);
-  --text-accent: hsl(258, 77%, 81%);
   
   /* Interactive Elements */
   --border-subtle: hsla(258, 84%, 68%, 0.2);
@@ -304,4 +304,12 @@
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+}
+
+/* 간단한 그라데이션 텍스트 */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
