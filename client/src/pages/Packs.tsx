@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MobileLayout } from '@/components/mobile/MobileLayout';
 import { NothingCard } from '@/components/mobile/NothingCard';
-import { Search, Filter, Clock, Signal, Star, Sparkles } from 'lucide-react';
+import { Search, Filter, Clock, Signal, Star, Sparkles, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Mock data for popular packs
