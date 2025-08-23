@@ -65,25 +65,33 @@ function EmptyState({ onQuickStart }: { onQuickStart: (message: string) => void 
         <GraduationCap className="w-10 h-10 text-white" />
       </div>
       
-      <h2 className="text-2xl font-bold mb-4 text-center">
+      <h2 className="text-4xl font-bold mb-6 text-center leading-tight">
         <span className="text-white">Absolutely</span>
-        <span className="gradient-text"> Nothing™</span>
+        <br />
+        <span className="text-transparent bg-gradient-to-r from-accent-purple via-accent-blue to-accent-glow bg-clip-text animate-pulse"> Nothing™</span>
       </h2>
       
       <p className="text-xs mb-2" style={{ color: 'var(--accent-glow)' }}>
         {loadingText}
       </p>
       
-      <p className="text-gray-400 text-center mb-8 max-w-sm">
-        깊이 있는 학습 경험을 위한 AI 어시스턴트입니다.
+      <p className="text-gray-300 text-center mb-8 max-w-lg text-lg opacity-90 leading-relaxed">
+        Experience the profound power of AI-assisted learning.
+        <br />
+        <span className="text-accent-glow text-sm">깊이 있는 지식을 전송할 준비가 완료되었습니다.</span>
       </p>
       
       <button 
         onClick={() => onQuickStart("안녕하세요!")}
-        className="floating-action px-6 py-3 text-white rounded-2xl font-medium transition-all duration-300 hover:scale-105"
+        className="relative px-8 py-4 text-white rounded-3xl font-bold text-lg transition-all duration-500 hover:scale-110 transform bg-gradient-to-r from-accent-purple via-accent-blue to-accent-purple shadow-2xl shadow-accent-purple/50"
         data-testid="button-quick-start"
       >
-        대화 시작하기
+        {/* Button glow effect */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-accent-purple via-accent-blue to-accent-purple rounded-3xl opacity-30 blur-lg animate-pulse"></div>
+        
+        <span className="relative z-10 drop-shadow-lg">
+          대화 시작하기
+        </span>
       </button>
     </div>
   );
