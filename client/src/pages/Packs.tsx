@@ -193,23 +193,23 @@ export default function Packs() {
 
       {/* Featured Sections */}
       <section className="px-4 mb-8">
-        <h2 className="text-white font-semibold text-lg mb-4 flex items-center">
-          <Star className="mr-2 text-accent-warning" size={20} />
-          인기 학습팩
+        <h2 className="text-white font-semibold text-xl mb-6 flex items-center">
+          <Star className="mr-2 text-accent-warning drop-shadow-lg" size={24} />
+          <span className="text-white">Popular</span>
+          <span className="text-transparent bg-gradient-to-r from-accent-warning to-accent-purple bg-clip-text ml-2"> Learning™</span>
         </h2>
         <div className="flex space-x-4 overflow-x-auto pb-4 px-2">
           {popularPacks.map((pack) => (
-            <div key={pack.id} className="flex-shrink-0 w-64">
-              <div className="transform hover:scale-105 transition-transform duration-300 origin-center">
-                <div className="gradient-glow click-effect">
-                  <NothingCard
-                    title={pack.title}
-                    subtitle={pack.description}
-                    icon={<span className="text-lg">{getPackIcon(pack.category)}</span>}
-                    onTap={() => console.log('Popular pack selected:', pack.id)}
-                    data-testid={`popular-pack-${pack.id}`}
-                    className="hover:scale-100"
-                  >
+            <div key={pack.id} className="flex-shrink-0 w-60">
+              <div className="gradient-glow click-effect">
+                <NothingCard
+                  title={pack.title}
+                  subtitle={pack.description}
+                  icon={<span className="text-lg">{getPackIcon(pack.category)}</span>}
+                  onTap={() => console.log('Popular pack selected:', pack.id)}
+                  data-testid={`popular-pack-${pack.id}`}
+                  className="hover:shadow-lg hover:shadow-accent-purple/30 transition-all duration-300"
+                >
                     <div className="flex items-center justify-between text-xs text-gray-500">
                       <span className="flex items-center">
                         <Clock size={10} className="mr-1" />
@@ -220,8 +220,7 @@ export default function Packs() {
                         {pack.rating}
                       </span>
                     </div>
-                  </NothingCard>
-                </div>
+                </NothingCard>
               </div>
             </div>
           ))}
@@ -229,9 +228,10 @@ export default function Packs() {
       </section>
 
       <section className="px-4 mb-8">
-        <h2 className="text-white font-semibold text-lg mb-4 flex items-center">
-          <Sparkles className="mr-2 text-accent-purple" size={20} />
-          AI 맞춤 추천
+        <h2 className="text-white font-semibold text-xl mb-6 flex items-center">
+          <Sparkles className="mr-2 text-accent-purple drop-shadow-lg animate-pulse" size={24} />
+          <span className="text-white">AI</span>
+          <span className="text-transparent bg-gradient-to-r from-accent-purple to-accent-blue bg-clip-text ml-2"> Recommendations™</span>
         </h2>
         <div className="space-y-3">
           {recommendedPacks.map((pack) => (

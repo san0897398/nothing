@@ -51,7 +51,7 @@ export function NothingBottomNav() {
         {/* Ambient glow on top */}
         <div className="absolute -top-1 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-accent-purple/40 to-transparent"></div>
         
-        <div className="px-6 py-4 relative">
+        <div className="px-4 py-2 relative">
           <div className="flex justify-around items-center">
             {tabs.map((tab, index) => {
               const isActive = location === tab.path;
@@ -62,10 +62,10 @@ export function NothingBottomNav() {
                   key={tab.id}
                   onClick={() => handleTabClick(index, tab.path)}
                   className={cn(
-                    "relative min-w-[70px] h-16 flex flex-col items-center justify-center rounded-2xl transition-all duration-500 transform",
-                    "hover:scale-110 active:scale-95",
+                    "relative min-w-[60px] h-12 flex flex-col items-center justify-center rounded-2xl transition-all duration-300 transform",
+                    "hover:scale-105 active:scale-95",
                     isActive 
-                      ? "text-white bg-gradient-to-br from-accent-purple via-accent-blue to-accent-purple shadow-2xl shadow-accent-purple/50 scale-125" 
+                      ? "text-white bg-gradient-to-br from-accent-purple via-accent-blue to-accent-purple shadow-lg shadow-accent-purple/30 scale-110" 
                       : "text-gray-400 hover:text-accent-purple hover:bg-accent-purple/15"
                   )}
                   data-testid={`nav-${tab.id}`}
@@ -77,14 +77,14 @@ export function NothingBottomNav() {
                   
                   <div className="relative z-10 flex flex-col items-center">
                     <Icon 
-                      size={isActive ? 28 : 22} 
+                      size={isActive ? 22 : 20} 
                       className={cn(
-                        "mb-2 transition-all duration-300",
-                        isActive ? "drop-shadow-[0_0_12px_white]" : ""
+                        "mb-1 transition-all duration-300",
+                        isActive ? "drop-shadow-[0_0_8px_white]" : ""
                       )} 
                     />
                     <span className={cn(
-                      "text-xs font-bold tracking-wide",
+                      "text-xs font-medium tracking-wide",
                       isActive ? "text-white drop-shadow-lg" : ""
                     )}>
                       {tab.label}

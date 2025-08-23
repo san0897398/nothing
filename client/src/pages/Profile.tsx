@@ -131,9 +131,12 @@ export default function Profile() {
         </div>
       </section>
 
-      {/* Stats Overview */}
+      {/* Nothing™ Stats Overview */}
       <section className="px-4 mb-8">
-        <h2 className="text-white font-semibold mobile-text-xl mb-6">학습 통계</h2>
+        <h2 className="text-white font-semibold text-xl mb-6">
+          <span className="text-white">Learning</span>
+          <span className="text-transparent bg-gradient-to-r from-accent-purple to-accent-blue bg-clip-text"> Analytics™</span>
+        </h2>
         
         <div className="grid grid-cols-2 gap-4 mb-6">
           <NothingCard 
@@ -153,12 +156,26 @@ export default function Profile() {
         </div>
 
         <div className="space-y-4">
-          <NothingCard title="전체 학습 진도" icon={<Target />}>
-            <LearningProgressBar 
-              progress={averageProgress}
-              subtitle="평균 완료율"
-              size="lg"
-            />
+          <NothingCard title="마인드 업로딩 진행률" icon={<Target />}>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-white font-medium">시스템 동조화</span>
+                <span className="text-accent-glow font-bold">{averageProgress}%</span>
+              </div>
+              <div className="w-full bg-primary-700 rounded-full h-3 relative overflow-hidden">
+                <div 
+                  className="bg-gradient-to-r from-accent-purple via-accent-blue to-accent-glow h-3 rounded-full animate-pulse transition-all duration-1000" 
+                  style={{ width: `${averageProgress}%` }}
+                ></div>
+                <div 
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent h-3 rounded-full animate-pulse" 
+                  style={{ width: `${averageProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-xs text-accent-glow text-center">
+                지식 전송 중... Nothing™ 학습 시스템 활성화됨
+              </p>
+            </div>
           </NothingCard>
 
           <NothingCard title="총 학습 시간" icon={<Clock />}>
@@ -175,9 +192,12 @@ export default function Profile() {
         </div>
       </section>
 
-      {/* Recent Achievements */}
+      {/* Nothing™ Achievements */}
       <section className="px-4 mb-8">
-        <h2 className="text-white font-semibold mobile-text-xl mb-6">최근 성취</h2>
+        <h2 className="text-white font-semibold text-xl mb-6">
+          <span className="text-white">Recent</span>
+          <span className="text-transparent bg-gradient-to-r from-accent-purple to-accent-blue bg-clip-text"> Achievements™</span>
+        </h2>
         
         <div className="space-y-3">
           {completedPacks > 0 && (

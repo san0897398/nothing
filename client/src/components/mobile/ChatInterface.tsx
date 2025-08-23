@@ -100,17 +100,24 @@ function EmptyState({ onQuickStart }: { onQuickStart: (message: string) => void 
 // MessageBubble 컴포넌트
 function MessageBubble({ message }: { message: Message }) {
   return (
-    <div className={`flex ${message.type === 'ai' ? 'justify-start' : 'justify-end'} mb-4`}>
-      <div className={`max-w-[85%] p-4 rounded-2xl transition-all duration-300 ${
+    <div className={`flex ${message.type === 'ai' ? 'justify-start' : 'justify-end'} mb-6`}>
+      <div className={`max-w-[80%] p-4 rounded-2xl transition-all duration-300 ${
         message.type === 'ai' 
-          ? 'chat-bubble-ai text-white' 
-          : 'chat-bubble-user text-white'
+          ? 'bg-gradient-to-br from-primary-800 to-primary-700 border border-accent-purple/20 text-white' 
+          : 'bg-gradient-to-br from-accent-purple to-accent-blue text-white shadow-lg shadow-accent-purple/20'
       }`}>
-        <p className="leading-relaxed">{message.content}</p>
-        <div className="mt-2 text-xs opacity-70">
-          {new Date(message.timestamp).toLocaleTimeString('ko-KR', {
-            hour: '2-digit', minute: '2-digit'
-          })}
+        <p className="leading-relaxed text-sm">{message.content}</p>
+        <div className="mt-3 text-xs opacity-60 flex items-center justify-between">
+          <span>
+            {new Date(message.timestamp).toLocaleTimeString('ko-KR', {
+              hour: '2-digit', minute: '2-digit'
+            })}
+          </span>
+          {message.type === 'ai' && (
+            <span className="text-accent-glow text-xs">
+              Nothing™ AI
+            </span>
+          )}
         </div>
       </div>
     </div>
