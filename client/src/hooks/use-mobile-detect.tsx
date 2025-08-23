@@ -27,9 +27,9 @@ export function useMobileDetect(): DeviceInfo {
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     
     return {
-      isMobile: width <= 767 && isTouchDevice,
-      isTablet: width >= 768 && width <= 1023 && isTouchDevice,
-      isDesktop: width >= 1024 || !isTouchDevice,
+      isMobile: width <= 767,
+      isTablet: width >= 768 && width <= 1023,
+      isDesktop: width >= 1024,
       screenWidth: width,
       isTouchDevice,
       userAgent,
@@ -43,9 +43,9 @@ export function useMobileDetect(): DeviceInfo {
       const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
       
       setDeviceInfo({
-        isMobile: width <= 767 && isTouchDevice,
-        isTablet: width >= 768 && width <= 1023 && isTouchDevice,
-        isDesktop: width >= 1024 || !isTouchDevice,
+        isMobile: width <= 767,
+        isTablet: width >= 768 && width <= 1023,
+        isDesktop: width >= 1024,
         screenWidth: width,
         isTouchDevice,
         userAgent,
