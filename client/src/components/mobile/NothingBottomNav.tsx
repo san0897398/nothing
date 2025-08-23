@@ -47,11 +47,8 @@ export function NothingBottomNav() {
       data-testid="bottom-navigation"
     >
       {/* Nothing™ Navigation Bar */}
-      <div className="bg-gradient-to-r from-primary-900/98 via-primary-800/98 to-primary-900/98 backdrop-blur-2xl border-t-2 border-accent-purple/30">
-        {/* Ambient glow on top */}
-        <div className="absolute -top-1 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-accent-purple/40 to-transparent"></div>
-        
-        <div className="px-4 py-2 relative">
+      <div className="bg-primary-900/95 backdrop-blur-sm border-t border-accent-purple/20">
+        <div className="px-4 py-2">
           <div className="flex justify-around items-center">
             {tabs.map((tab, index) => {
               const isActive = location === tab.path;
@@ -62,41 +59,25 @@ export function NothingBottomNav() {
                   key={tab.id}
                   onClick={() => handleTabClick(index, tab.path)}
                   className={cn(
-                    "relative min-w-[60px] h-12 flex flex-col items-center justify-center rounded-2xl transition-all duration-300 transform",
-                    "hover:scale-105 active:scale-95",
-                    isActive 
-                      ? "text-white bg-gradient-to-br from-accent-purple via-accent-blue to-accent-purple shadow-lg shadow-accent-purple/30 scale-110" 
-                      : "text-gray-400 hover:text-accent-purple hover:bg-accent-purple/15"
+                    "min-w-[60px] min-h-[48px] flex flex-col items-center justify-center rounded-xl transition-all duration-300",
+                    "hover:bg-accent-purple/10 active:scale-95",
+                    isActive ? "text-accent-purple" : "text-gray-400"
                   )}
                   data-testid={`nav-${tab.id}`}
                 >
-                  {/* Active state glow effect */}
-                  {isActive && (
-                    <div className="absolute -inset-2 bg-gradient-to-r from-accent-purple to-accent-blue rounded-2xl opacity-40 blur-xl animate-pulse"></div>
-                  )}
-                  
-                  <div className="relative z-10 flex flex-col items-center">
-                    <Icon 
-                      size={isActive ? 22 : 20} 
-                      className={cn(
-                        "mb-1 transition-all duration-300",
-                        isActive ? "drop-shadow-[0_0_8px_white]" : ""
-                      )} 
-                    />
-                    <span className={cn(
-                      "text-xs font-medium tracking-wide",
-                      isActive ? "text-white drop-shadow-lg" : ""
-                    )}>
-                      {tab.label}
-                    </span>
-                  </div>
+                  <Icon 
+                    size={20} 
+                    className={cn(
+                      "mb-1 transition-all duration-300",
+                      isActive && "drop-shadow-[0_0_8px_var(--accent-purple)]"
+                    )} 
+                  />
+                  <span className="text-xs font-medium">{tab.label}</span>
                 </button>
               );
             })}
           </div>
           
-          {/* Bottom accent line */}
-          <div className="absolute bottom-0 left-1/4 right-1/4 h-1 bg-gradient-to-r from-transparent via-accent-purple to-transparent rounded-full"></div>
         </div>
       </div>
     </nav>

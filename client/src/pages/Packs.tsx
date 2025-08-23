@@ -194,34 +194,32 @@ export default function Packs() {
       {/* Featured Sections */}
       <section className="px-4 mb-8">
         <h2 className="text-white font-semibold text-xl mb-6 flex items-center">
-          <Star className="mr-2 text-accent-warning drop-shadow-lg" size={24} />
+          <Star className="mr-2 text-accent-warning" size={24} />
           <span className="text-white">Popular</span>
           <span className="text-transparent bg-gradient-to-r from-accent-warning to-accent-purple bg-clip-text ml-2"> Learning™</span>
         </h2>
-        <div className="flex space-x-3 overflow-x-auto pb-4 px-1 scrollbar-hide" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+        <div className="flex space-x-4 overflow-x-auto pb-4 px-4 scrollbar-hide" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
           {popularPacks.map((pack) => (
-            <div key={pack.id} className="flex-shrink-0 w-52">
-              <div className="gradient-glow click-effect">
-                <NothingCard
-                  title={pack.title}
-                  subtitle={pack.description}
-                  icon={<span className="text-lg">{getPackIcon(pack.category)}</span>}
-                  onTap={() => console.log('Popular pack selected:', pack.id)}
-                  data-testid={`popular-pack-${pack.id}`}
-                  className="hover:shadow-lg hover:shadow-accent-purple/30 transition-all duration-300"
-                >
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span className="flex items-center">
-                        <Clock size={10} className="mr-1" />
-                        {pack.duration}분
-                      </span>
-                      <span className="flex items-center text-accent-warning">
-                        <Star size={10} className="mr-1" />
-                        {pack.rating}
-                      </span>
-                    </div>
-                </NothingCard>
-              </div>
+            <div key={pack.id} className="flex-shrink-0 w-48">
+              <NothingCard
+                title={pack.title}
+                subtitle={pack.description}
+                icon={<span className="text-lg">{getPackIcon(pack.category)}</span>}
+                onTap={() => console.log('Popular pack selected:', pack.id)}
+                data-testid={`popular-pack-${pack.id}`}
+                className="hover:bg-primary-700/50 transition-colors duration-200"
+              >
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span className="flex items-center">
+                    <Clock size={10} className="mr-1" />
+                    {pack.duration}분
+                  </span>
+                  <span className="flex items-center text-accent-warning">
+                    <Star size={10} className="mr-1" />
+                    {pack.rating}
+                  </span>
+                </div>
+              </NothingCard>
             </div>
           ))}
         </div>
@@ -229,7 +227,7 @@ export default function Packs() {
 
       <section className="px-4 mb-8">
         <h2 className="text-white font-semibold text-xl mb-6 flex items-center">
-          <Sparkles className="mr-2 text-accent-purple drop-shadow-lg animate-pulse" size={24} />
+          <Sparkles className="mr-2 text-accent-purple" size={24} />
           <span className="text-white">AI</span>
           <span className="text-transparent bg-gradient-to-r from-accent-purple to-accent-blue bg-clip-text ml-2"> Recommendations™</span>
         </h2>

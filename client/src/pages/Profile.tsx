@@ -92,58 +92,41 @@ export default function Profile() {
 
   return (
     <MobileLayout>
-      {/* Nothing™ Profile Header */}
-      <section className="px-4 py-12 relative overflow-hidden">
-        {/* Background ambient effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/10 via-transparent to-accent-blue/10 animate-pulse"></div>
-        
-        <div className="text-center mb-8 relative z-10">
-          {/* Profile Image with Nothing™ glow */}
+      {/* Profile Header */}
+      <section className="px-4 py-8">
+        <div className="text-center mb-8">
+          {/* Profile Image */}
           <div className="relative mb-6">
             {user?.profileImageUrl ? (
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-accent-purple to-accent-blue rounded-full opacity-30 blur-xl animate-pulse"></div>
-                <img
-                  src={user.profileImageUrl}
-                  alt="Profile"
-                  className="relative w-32 h-32 rounded-full mx-auto object-cover border-4 border-accent-purple/50 shadow-2xl shadow-accent-purple/50"
-                  data-testid="profile-image"
-                />
-              </div>
+              <img
+                src={user.profileImageUrl}
+                alt="Profile"
+                className="w-24 h-24 rounded-full mx-auto object-cover border-2 border-accent-purple/30"
+                data-testid="profile-image"
+              />
             ) : (
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-accent-purple to-accent-blue rounded-full opacity-40 blur-xl animate-pulse"></div>
-                <div className="relative w-32 h-32 mx-auto rounded-full bg-gradient-to-br from-accent-purple via-accent-blue to-accent-glow flex items-center justify-center shadow-2xl shadow-accent-purple/50 animate-pulse">
-                  <User className="text-white drop-shadow-lg" size={48} />
-                </div>
+              <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-accent-purple to-accent-blue flex items-center justify-center">
+                <User className="text-white" size={36} />
               </div>
             )}
-            <button className="absolute bottom-2 right-1/2 transform translate-x-16 bg-gradient-to-r from-accent-purple to-accent-blue rounded-full w-10 h-10 flex items-center justify-center text-white hover:scale-110 transition-all duration-300 shadow-lg shadow-accent-purple/50">
-              <Edit3 size={16} />
+            <button className="absolute bottom-0 right-1/2 transform translate-x-12 bg-accent-purple rounded-full w-8 h-8 flex items-center justify-center text-white hover:bg-accent-purple/80 transition-colors">
+              <Edit3 size={14} />
             </button>
           </div>
 
-          {/* User Info with Nothing™ styling */}
-          <h1 className="text-3xl font-bold mb-3 leading-tight">
-            <span className="text-white drop-shadow-lg">
-              {user?.firstName || user?.lastName 
-                ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
-                : 'Nothing'
-              }
-            </span>
-            <span className="text-transparent bg-gradient-to-r from-accent-purple to-accent-blue bg-clip-text">™</span>
+          {/* User Info */}
+          <h1 className="text-2xl font-bold text-white mb-2">
+            {user?.firstName || user?.lastName 
+              ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
+              : '학습자'
+            }
           </h1>
-          <p className="text-accent-glow text-base mb-6 opacity-90">{user?.email}</p>
+          <p className="text-gray-400 text-sm mb-4">{user?.email}</p>
           
-          {/* Learning Level Badge with glow */}
-          <div className="relative inline-flex items-center px-6 py-3 rounded-full text-white text-base font-bold">
-            <div className="absolute inset-0 bg-gradient-to-r from-accent-purple via-accent-blue to-accent-glow rounded-full animate-pulse"></div>
-            <div className="relative z-10 flex items-center">
-              <Trophy size={20} className="mr-3 drop-shadow-lg" />
-              <span className="drop-shadow-lg">
-                {completedPacks < 5 ? 'Novice Learner' : completedPacks < 15 ? 'Advanced Learner' : 'Master Learner'}™
-              </span>
-            </div>
+          {/* Learning Level Badge */}
+          <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-accent-purple to-accent-blue rounded-full text-white text-sm font-medium">
+            <Trophy size={16} className="mr-2" />
+            {completedPacks < 5 ? '초보 학습자' : completedPacks < 15 ? '중급 학습자' : '고급 학습자'}
           </div>
         </div>
       </section>
@@ -156,24 +139,20 @@ export default function Profile() {
         </h2>
         
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="gradient-glow click-effect">
-            <NothingCard 
-              title={completedPacks.toString()}
-              subtitle="완료한 팩"
-              icon={<Trophy className="text-accent-success drop-shadow-lg" />}
-              className="text-center hover:scale-105 transition-all duration-300"
-              data-testid="stat-completed"
-            />
-          </div>
-          <div className="gradient-glow click-effect">
-            <NothingCard 
-              title={inProgressPacks.toString()}
-              subtitle="진행 중인 팩"
-              icon={<BookOpen className="text-accent-warning drop-shadow-lg" />}
-              className="text-center hover:scale-105 transition-all duration-300"
-              data-testid="stat-in-progress"
-            />
-          </div>
+          <NothingCard 
+            title={completedPacks.toString()}
+            subtitle="완료한 팩"
+            icon={<Trophy className="text-accent-success" />}
+            className="text-center"
+            data-testid="stat-completed"
+          />
+          <NothingCard 
+            title={inProgressPacks.toString()}
+            subtitle="진행 중인 팩"
+            icon={<BookOpen className="text-accent-warning" />}
+            className="text-center"
+            data-testid="stat-in-progress"
+          />
         </div>
 
         <div className="space-y-4">
@@ -181,37 +160,31 @@ export default function Profile() {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-white font-medium">시스템 동조화</span>
-                <span className="text-accent-glow font-bold">{averageProgress}%</span>
+                <span className="text-accent-purple font-bold">{averageProgress}%</span>
               </div>
-              <div className="w-full bg-primary-700 rounded-full h-3 relative overflow-hidden">
+              <div className="w-full bg-primary-700 rounded-full h-3">
                 <div 
-                  className="bg-gradient-to-r from-accent-purple via-accent-blue to-accent-glow h-3 rounded-full animate-pulse transition-all duration-1000" 
-                  style={{ width: `${averageProgress}%` }}
-                ></div>
-                <div 
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent h-3 rounded-full animate-pulse" 
+                  className="bg-gradient-to-r from-accent-purple to-accent-blue h-3 rounded-full transition-all duration-300" 
                   style={{ width: `${averageProgress}%` }}
                 ></div>
               </div>
-              <p className="text-xs text-accent-glow text-center">
+              <p className="text-xs text-accent-purple/70 text-center">
                 지식 전송 중... Nothing™ 학습 시스템 활성화됨
               </p>
             </div>
           </NothingCard>
 
-          <div className="gradient-glow click-effect">
-            <NothingCard title="총 학습 시간" icon={<Clock className="drop-shadow-lg" />} className="hover:scale-105 transition-all duration-300">
-              <div className="text-center">
-                <span className="text-4xl font-bold text-white drop-shadow-lg">
-                  {Math.floor(totalTimeSpent / 3600)}
-                </span>
-                <span className="text-accent-glow ml-2 font-medium">시간</span>
-                <p className="text-accent-glow/70 text-sm mt-2">
-                  이번 달: {Math.floor(totalTimeSpent / 3600 * 0.3)}시간
-                </p>
-              </div>
-            </NothingCard>
-          </div>
+          <NothingCard title="총 학습 시간" icon={<Clock />}>
+            <div className="text-center">
+              <span className="text-3xl font-bold text-white">
+                {Math.floor(totalTimeSpent / 3600)}
+              </span>
+              <span className="text-gray-400 ml-2">시간</span>
+              <p className="text-gray-400 text-sm mt-1">
+                이번 달: {Math.floor(totalTimeSpent / 3600 * 0.3)}시간
+              </p>
+            </div>
+          </NothingCard>
         </div>
       </section>
 
@@ -222,39 +195,30 @@ export default function Profile() {
           <span className="text-transparent bg-gradient-to-r from-accent-purple to-accent-blue bg-clip-text"> Achievements™</span>
         </h2>
         
-        <div className="space-y-4">
+        <div className="space-y-3">
           {completedPacks > 0 && (
-            <div className="gradient-glow click-effect">
-              <NothingCard 
-                title="첫 번째 팩 완료" 
-                subtitle="학습 여정을 시작했어요!"
-                icon={<Star className="text-accent-success drop-shadow-lg animate-pulse" />}
-                data-testid="achievement-first-pack"
-                className="hover:scale-105 transition-all duration-300"
-              />
-            </div>
+            <NothingCard 
+              title="첫 번째 팩 완료" 
+              subtitle="학습 여정을 시작했어요!"
+              icon={<Star className="text-accent-success" />}
+              data-testid="achievement-first-pack"
+            />
           )}
           
           {completedPacks >= 5 && (
-            <div className="gradient-glow click-effect">
-              <NothingCard 
-                title="연속 학습자" 
-                subtitle="5개 팩을 완료했어요!"
-                icon={<Trophy className="text-accent-warning drop-shadow-lg animate-bounce" />}
-                data-testid="achievement-streak"
-                className="hover:scale-105 transition-all duration-300"
-              />
-            </div>
+            <NothingCard 
+              title="연속 학습자" 
+              subtitle="5개 팩을 완료했어요!"
+              icon={<Trophy className="text-accent-warning" />}
+              data-testid="achievement-streak"
+            />
           )}
 
           {completedPacks === 0 && (
-            <div className="text-center py-12 text-gray-400 relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/5 to-accent-blue/5 rounded-2xl animate-pulse"></div>
-              <div className="relative z-10">
-                <Trophy className="mx-auto mb-6 drop-shadow-lg" size={48} />
-                <p className="text-lg mb-2 text-white">첫 번째 학습팩을 완료하면</p>
-                <p className="text-accent-glow">Nothing™ 성취 배지를 받을 수 있어요!</p>
-              </div>
+            <div className="text-center py-8 text-gray-400">
+              <Trophy className="mx-auto mb-4" size={32} />
+              <p>첫 번째 학습팩을 완료하면</p>
+              <p className="text-sm">성취 배지를 받을 수 있어요!</p>
             </div>
           )}
         </div>
@@ -265,43 +229,39 @@ export default function Profile() {
         <h2 className="text-white font-semibold mobile-text-xl mb-6">설정</h2>
         
         <div className="space-y-4">
-          <div className="gradient-glow click-effect">
-            <NothingCard title="알림 설정" icon={<Bell className="drop-shadow-lg" />} className="hover:scale-105 transition-all duration-300">
-              <div className="flex items-center justify-between">
-                <span className="text-white font-medium">학습 알림</span>
-                <button 
-                  onClick={() => setNotifications(!notifications)}
-                  className={`w-14 h-7 rounded-full relative transition-all duration-300 ${
-                    notifications ? 'bg-gradient-to-r from-accent-purple to-accent-blue shadow-lg shadow-accent-purple/30' : 'bg-gray-600'
-                  }`}
-                  data-testid="toggle-notifications"
-                >
-                  <div className={`w-6 h-6 bg-white rounded-full absolute top-0.5 transition-all duration-300 shadow-lg ${
-                    notifications ? 'translate-x-7 shadow-accent-purple/50' : 'translate-x-0.5'
-                  }`}></div>
-                </button>
-              </div>
-            </NothingCard>
-          </div>
+          <NothingCard title="알림 설정" icon={<Bell />}>
+            <div className="flex items-center justify-between">
+              <span className="text-white text-sm">학습 알림</span>
+              <button 
+                onClick={() => setNotifications(!notifications)}
+                className={`w-12 h-6 rounded-full relative transition-colors ${
+                  notifications ? 'bg-accent-purple' : 'bg-gray-600'
+                }`}
+                data-testid="toggle-notifications"
+              >
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${
+                  notifications ? 'translate-x-6' : 'translate-x-0.5'
+                }`}></div>
+              </button>
+            </div>
+          </NothingCard>
 
-          <div className="gradient-glow click-effect">
-            <NothingCard title="테마 설정" icon={darkMode ? <Moon className="drop-shadow-lg animate-pulse" /> : <Sun className="drop-shadow-lg" />} className="hover:scale-105 transition-all duration-300">
-              <div className="flex items-center justify-between">
-                <span className="text-white font-medium">다크 모드</span>
-                <button 
-                  onClick={() => setDarkMode(!darkMode)}
-                  className={`w-14 h-7 rounded-full relative transition-all duration-300 ${
-                    darkMode ? 'bg-gradient-to-r from-accent-purple to-accent-blue shadow-lg shadow-accent-purple/30' : 'bg-gray-600'
-                  }`}
-                  data-testid="toggle-dark-mode"
-                >
-                  <div className={`w-6 h-6 bg-white rounded-full absolute top-0.5 transition-all duration-300 shadow-lg ${
-                    darkMode ? 'translate-x-7 shadow-accent-purple/50' : 'translate-x-0.5'
-                  }`}></div>
-                </button>
-              </div>
-            </NothingCard>
-          </div>
+          <NothingCard title="테마 설정" icon={darkMode ? <Moon /> : <Sun />}>
+            <div className="flex items-center justify-between">
+              <span className="text-white text-sm">다크 모드</span>
+              <button 
+                onClick={() => setDarkMode(!darkMode)}
+                className={`w-12 h-6 rounded-full relative transition-colors ${
+                  darkMode ? 'bg-accent-purple' : 'bg-gray-600'
+                }`}
+                data-testid="toggle-dark-mode"
+              >
+                <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${
+                  darkMode ? 'translate-x-6' : 'translate-x-0.5'
+                }`}></div>
+              </button>
+            </div>
+          </NothingCard>
 
           <NothingCard 
             title="개인정보 보호" 

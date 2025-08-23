@@ -65,10 +65,10 @@ function EmptyState({ onQuickStart }: { onQuickStart: (message: string) => void 
         <GraduationCap className="w-10 h-10 text-white" />
       </div>
       
-      <h2 className="text-4xl font-bold mb-6 text-center leading-tight">
+      <h2 className="text-3xl font-bold mb-4 text-center leading-tight">
         <span className="text-white">Absolutely</span>
         <br />
-        <span className="text-transparent bg-gradient-to-r from-accent-purple via-accent-blue to-accent-glow bg-clip-text animate-pulse"> Nothing™</span>
+        <span className="text-transparent bg-gradient-to-r from-accent-purple via-accent-blue to-accent-glow bg-clip-text"> Nothing™</span>
       </h2>
       
       <p className="text-xs mb-2" style={{ color: 'var(--accent-glow)' }}>
@@ -83,15 +83,10 @@ function EmptyState({ onQuickStart }: { onQuickStart: (message: string) => void 
       
       <button 
         onClick={() => onQuickStart("안녕하세요!")}
-        className="relative px-8 py-4 text-white rounded-3xl font-bold text-lg transition-all duration-500 hover:scale-110 transform bg-gradient-to-r from-accent-purple via-accent-blue to-accent-purple shadow-2xl shadow-accent-purple/50"
+        className="px-6 py-3 text-white rounded-2xl font-medium transition-colors duration-200 bg-gradient-to-r from-accent-purple to-accent-blue hover:opacity-90"
         data-testid="button-quick-start"
       >
-        {/* Button glow effect */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-accent-purple via-accent-blue to-accent-purple rounded-3xl opacity-30 blur-lg animate-pulse"></div>
-        
-        <span className="relative z-10 drop-shadow-lg">
-          대화 시작하기
-        </span>
+        대화 시작하기
       </button>
     </div>
   );
@@ -189,14 +184,14 @@ function ChatInput({
   disabled?: boolean;
 }) {
   return (
-    <div className="p-4 bg-gradient-to-r from-primary-900/95 via-primary-800/95 to-primary-900/95 backdrop-blur-xl border-t border-accent-purple/20 mobile-safe-area">
-      <div className="flex items-end space-x-3">
+    <div className="p-4 bg-primary-900/95 backdrop-blur-sm border-t border-accent-purple/20 mobile-safe-area">
+      <div className="flex items-center space-x-3">
         <button
           onClick={onToggleFileInput}
-          className={`p-3 rounded-full transition-all duration-300 ${
+          className={`p-3 rounded-full transition-colors duration-200 ${
             showFileInput
-              ? 'bg-gradient-to-br from-accent-purple to-accent-blue text-white shadow-lg shadow-accent-purple/30'
-              : 'bg-primary-700 text-gray-400 hover:bg-accent-purple/20 hover:text-accent-purple'
+              ? 'bg-accent-purple text-white'
+              : 'bg-primary-700 text-gray-400 hover:bg-primary-600'
           }`}
           data-testid="button-file-input"
         >
@@ -209,7 +204,7 @@ function ChatInput({
             onChange={(e) => onMessageChange(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="메시지를 입력하세요..."
-            className="w-full p-4 pr-14 bg-primary-800/50 text-white placeholder-gray-400 rounded-2xl border border-accent-purple/30 focus:outline-none focus:ring-2 focus:ring-accent-purple/50 resize-none mobile-text-base"
+            className="w-full p-4 pr-14 bg-primary-800 text-white placeholder-gray-400 rounded-2xl border border-accent-purple/20 focus:outline-none focus:ring-2 focus:ring-accent-purple/40 resize-none mobile-text-base"
             style={{ fontSize: '16px' }}
             rows={1}
             disabled={disabled}
@@ -219,7 +214,7 @@ function ChatInput({
           <button
             onClick={onSendMessage}
             disabled={disabled || !message.trim()}
-            className="absolute right-3 bottom-3 p-3 bg-gradient-to-r from-accent-purple to-accent-blue text-white rounded-full hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-accent-purple/30"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 bg-accent-purple text-white rounded-full hover:bg-accent-purple/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
             data-testid="button-send"
           >
             <Send size={16} />
