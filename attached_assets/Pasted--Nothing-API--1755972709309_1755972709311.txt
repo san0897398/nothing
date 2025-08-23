@@ -1,0 +1,894 @@
+# 📱 모바일 우선 학습앱 프론트엔드 개발 명세서
+## Nothing™ 스타일 + 기존 백엔드 활용 전략
+
+---
+
+## 🎯 프로젝트 개요
+
+**목표**: 기존 백엔드 API를 유지하면서 Nothing™ 스타일의 모바일 우선 학습앱 구축  
+**전략**: 클라이언트 사이드 최적화 + 최소한의 백엔드 변경  
+**핵심**: 세련된 UX + 빠른 출시 + 안정성 보장
+
+---
+
+## 🔧 필수 구현 요구사항
+
+### 1. 모바일 감지 훅 구체화
+
+#### 1.1 useMobileDetect() 정확한 구현
+```typescript
+// hooks/useMobileDetect.ts
+interface DeviceInfo {
+  isMobile: boolean;
+  isTablet: boolean;
+  isDesktop: boolean;
+  screenWidth: number;
+  isTouchDevice: boolean;
+  userAgent: string;
+}
+
+export const useMobileDetect = (): DeviceInfo => {
+  const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>({
+    isMobile: false,
+    isTablet: false,
+    isDesktop: true,
+    screenWidth: 1024,
+    isTouchDevice: false,
+    userAgent: ''
+  });
+
+  useEffect(() => {
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      const userAgent = navigator.userAgent;
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      
+      // 핵심 기준: 320px 최소 모바일 너비
+      const isMobile = width <= 767 && isTouchDevice;
+      const isTablet = width >= 768 && width <= 1023 && isTouchDevice;
+      const isDesktop = width >= 1024 || !isTouchDevice;
+
+      setDeviceInfo({
+        isMobile,
+        isTablet,
+        isDesktop,
+        screenWidth: width,
+        isTouchDevice,
+        userAgent
+      });
+    };
+
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    window.addEventListener('orientationchange', checkDevice);
+
+    return () => {
+      window.removeEventListener('resize', checkDevice);
+      window.removeEventListener('orientationchange', checkDevice);
+    };
+  }, []);
+
+  return deviceInfo;
+};
+```
+
+#### 1.2 조건부 레이아웃 구현
+```typescript
+// App.tsx - 완전 재작성
+import { useMobileDetect } from './hooks/useMobileDetect';
+import { MobileLayout } from './layouts/MobileLayout';
+import { DesktopLayout } from './layouts/DesktopLayout';
+
+const App: React.FC = () => {
+  const { isMobile, isTablet } = useMobileDetect();
+  
+  // 중요: 완전히 다른 레이아웃 렌더링
+  if (isMobile) {
+    return (
+      <MobileLayout>
+        <MobileRoutes />
+      </MobileLayout>
+    );
+  }
+  
+  if (isTablet) {
+    return (
+      <TabletLayout>
+        <TabletRoutes />
+      </TabletLayout>
+    );
+  }
+  
+  return (
+    <DesktopLayout>
+      <DesktopRoutes />
+    </DesktopLayout>
+  );
+};
+```
+
+### 2. 스와이프 제스처 추가
+
+#### 2.1 스와이프 훅 구현
+```typescript
+// hooks/useSwipeGesture.ts
+interface SwipeConfig {
+  onSwipeLeft?: () => void;
+  onSwipeRight?: () => void;
+  onSwipeUp?: () => void;
+  onSwipeDown?: () => void;
+  threshold?: number; // 최소 스와이프 거리 (기본: 50px)
+  preventDefaultTouchmoveEvent?: boolean;
+}
+
+export const useSwipeGesture = (config: SwipeConfig) => {
+  const {
+    onSwipeLeft,
+    onSwipeRight,
+    onSwipeUp,
+    onSwipeDown,
+    threshold = 50,
+    preventDefaultTouchmoveEvent = false
+  } = config;
+
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null);
+
+  const onTouchStart = (e: TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart({
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY
+    });
+  };
+
+  const onTouchMove = (e: TouchEvent) => {
+    if (preventDefaultTouchmoveEvent) {
+      e.preventDefault();
+    }
+    setTouchEnd({
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY
+    });
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distanceX = touchStart.x - touchEnd.x;
+    const distanceY = touchStart.y - touchEnd.y;
+    const isLeftSwipe = distanceX > threshold;
+    const isRightSwipe = distanceX < -threshold;
+    const isUpSwipe = distanceY > threshold;
+    const isDownSwipe = distanceY < -threshold;
+
+    // 수평 스와이프가 수직 스와이프보다 클 때만 처리
+    if (Math.abs(distanceX) > Math.abs(distanceY)) {
+      if (isLeftSwipe && onSwipeLeft) {
+        onSwipeLeft();
+      }
+      if (isRightSwipe && onSwipeRight) {
+        onSwipeRight();
+      }
+    } else {
+      if (isUpSwipe && onSwipeUp) {
+        onSwipeUp();
+      }
+      if (isDownSwipe && onSwipeDown) {
+        onSwipeDown();
+      }
+    }
+  };
+
+  return {
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd
+  };
+};
+```
+
+#### 2.2 탭 네비게이션에 스와이프 적용
+```typescript
+// components/mobile/MobileTabNavigation.tsx
+const MobileTabNavigation: React.FC = () => {
+  const [activeTab, setActiveTab] = useState(0);
+  const tabs = ['learn', 'packs', 'studio', 'profile'];
+  
+  const swipeHandlers = useSwipeGesture({
+    onSwipeLeft: () => {
+      // 다음 탭으로
+      setActiveTab(prev => Math.min(prev + 1, tabs.length - 1));
+    },
+    onSwipeRight: () => {
+      // 이전 탭으로
+      setActiveTab(prev => Math.max(prev - 1, 0));
+    },
+    threshold: 50
+  });
+
+  return (
+    <div 
+      className="h-full"
+      onTouchStart={swipeHandlers.onTouchStart}
+      onTouchMove={swipeHandlers.onTouchMove}
+      onTouchEnd={swipeHandlers.onTouchEnd}
+    >
+      {/* 탭 콘텐츠 */}
+      <div className="flex transition-transform duration-300 ease-out"
+           style={{ transform: `translateX(-${activeTab * 100}%)` }}>
+        {tabs.map((tab, index) => (
+          <div key={tab} className="w-full flex-shrink-0">
+            {renderTabContent(tab)}
+          </div>
+        ))}
+      </div>
+      
+      {/* 하단 네비게이션 */}
+      <NothingStyleBottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+    </div>
+  );
+};
+```
+
+### 3. Monaco 에디터 대체 구현
+
+#### 3.1 모바일 최적화 텍스트 에디터
+```typescript
+// components/mobile/MobileTemplateEditor.tsx
+interface MobileTemplateEditorProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  templateType: 'teach' | 'practice' | 'summary';
+}
+
+const MobileTemplateEditor: React.FC<MobileTemplateEditorProps> = ({
+  value,
+  onChange,
+  placeholder = "템플릿을 입력하세요...",
+  templateType
+}) => {
+  const [cursorPosition, setCursorPosition] = useState(0);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 빠른 스니펫 버튼들
+  const snippets = {
+    teach: [
+      { label: '변수 추가', text: '{{변수명}}' },
+      { label: '강조', text: '**중요한 내용**' },
+      { label: '예시', text: '\n예시: ' },
+      { label: '질문', text: '\n질문: ' }
+    ],
+    practice: [
+      { label: '객관식', text: '\n1. 선택지1\n2. 선택지2\n3. 선택지3\n4. 선택지4' },
+      { label: '주관식', text: '\n답: ___________' },
+      { label: '힌트', text: '\n💡 힌트: ' }
+    ],
+    summary: [
+      { label: '핵심 요약', text: '\n📝 핵심 내용:\n- ' },
+      { label: '복습 포인트', text: '\n🔄 복습할 점:\n- ' },
+      { label: '다음 단계', text: '\n➡️ 다음에 학습할 내용:\n- ' }
+    ]
+  };
+
+  const insertSnippet = (snippet: string) => {
+    if (!textareaRef.current) return;
+    
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const newValue = value.substring(0, start) + snippet + value.substring(end);
+    
+    onChange(newValue);
+    
+    // 커서 위치 조정
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + snippet.length, start + snippet.length);
+    }, 0);
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* 메인 텍스트 에리어 */}
+      <div className="relative">
+        <textarea
+          ref={textareaRef}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={cn(
+            "w-full min-h-[300px] p-4 rounded-xl border border-accent-purple/20",
+            "bg-primary-800 text-white placeholder-gray-400",
+            "resize-none focus:outline-none focus:ring-2 focus:ring-accent-purple/50",
+            "text-base leading-relaxed", // 16px 최소 크기로 iOS 줌 방지
+            "font-mono" // 코드/템플릿 편집에 적합
+          )}
+          style={{
+            fontSize: '16px', // iOS 줌 방지를 위한 명시적 크기
+            lineHeight: '1.5'
+          }}
+        />
+        
+        {/* 글자 수 카운터 */}
+        <div className="absolute bottom-2 right-2 text-xs text-gray-400">
+          {value.length} 글자
+        </div>
+      </div>
+
+      {/* 빠른 스니펫 버튼들 */}
+      <div className="space-y-3">
+        <h4 className="text-white font-medium text-sm">빠른 입력</h4>
+        <div className="flex flex-wrap gap-2">
+          {snippets[templateType].map((snippet, index) => (
+            <button
+              key={index}
+              onClick={() => insertSnippet(snippet.text)}
+              className={cn(
+                "px-3 py-2 bg-accent-purple/20 text-accent-purple text-sm rounded-lg",
+                "hover:bg-accent-purple/30 transition-colors",
+                "min-h-[44px] min-w-[60px]", // 터치 타겟 최소 크기
+                "border border-accent-purple/30"
+              )}
+            >
+              {snippet.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 템플릿 미리보기 (접을 수 있음) */}
+      <details className="bg-primary-700 rounded-xl p-4">
+        <summary className="text-white font-medium cursor-pointer">
+          미리보기
+        </summary>
+        <div className="mt-3 p-3 bg-primary-600 rounded-lg">
+          <pre className="text-gray-300 text-sm whitespace-pre-wrap">
+            {value || placeholder}
+          </pre>
+        </div>
+      </details>
+    </div>
+  );
+};
+```
+
+#### 3.2 변수 관리 인터페이스
+```typescript
+// components/mobile/MobileVariableManager.tsx
+interface Variable {
+  key: string;
+  value: string;
+  description?: string;
+}
+
+const MobileVariableManager: React.FC<{
+  variables: Record<string, any>;
+  onChange: (variables: Record<string, any>) => void;
+}> = ({ variables, onChange }) => {
+  const [variableList, setVariableList] = useState<Variable[]>(() => 
+    Object.entries(variables).map(([key, value]) => ({
+      key,
+      value: String(value),
+      description: ''
+    }))
+  );
+
+  const addVariable = () => {
+    const newVariable: Variable = {
+      key: '',
+      value: '',
+      description: ''
+    };
+    setVariableList([...variableList, newVariable]);
+  };
+
+  const updateVariable = (index: number, field: keyof Variable, value: string) => {
+    const updated = [...variableList];
+    updated[index] = { ...updated[index], [field]: value };
+    setVariableList(updated);
+    
+    // 부모 컴포넌트에 변경사항 전달
+    const variablesObject = updated.reduce((acc, variable) => {
+      if (variable.key.trim()) {
+        acc[variable.key] = variable.value;
+      }
+      return acc;
+    }, {} as Record<string, any>);
+    onChange(variablesObject);
+  };
+
+  const removeVariable = (index: number) => {
+    const updated = variableList.filter((_, i) => i !== index);
+    setVariableList(updated);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-white font-semibold text-lg">변수 관리</h3>
+        <button
+          onClick={addVariable}
+          className={cn(
+            "px-4 py-2 bg-accent-purple text-white rounded-lg",
+            "hover:bg-accent-purple/80 transition-colors",
+            "min-h-[44px] flex items-center space-x-2"
+          )}
+        >
+          <Plus size={20} />
+          <span>추가</span>
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        {variableList.map((variable, index) => (
+          <NothingCard
+            key={index}
+            title={variable.key || `변수 ${index + 1}`}
+            subtitle={variable.description || "설명 없음"}
+          >
+            <div className="space-y-3">
+              {/* 변수 키 */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  변수명
+                </label>
+                <input
+                  type="text"
+                  value={variable.key}
+                  onChange={(e) => updateVariable(index, 'key', e.target.value)}
+                  placeholder="변수명을 입력하세요"
+                  className={cn(
+                    "w-full p-3 bg-primary-700 text-white rounded-lg",
+                    "border border-accent-purple/20 focus:border-accent-purple/50",
+                    "focus:outline-none text-base" // iOS 줌 방지
+                  )}
+                />
+              </div>
+
+              {/* 변수 값 */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  기본값
+                </label>
+                <input
+                  type="text"
+                  value={variable.value}
+                  onChange={(e) => updateVariable(index, 'value', e.target.value)}
+                  placeholder="기본값을 입력하세요"
+                  className={cn(
+                    "w-full p-3 bg-primary-700 text-white rounded-lg",
+                    "border border-accent-purple/20 focus:border-accent-purple/50",
+                    "focus:outline-none text-base"
+                  )}
+                />
+              </div>
+
+              {/* 설명 */}
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">
+                  설명 (선택사항)
+                </label>
+                <input
+                  type="text"
+                  value={variable.description}
+                  onChange={(e) => updateVariable(index, 'description', e.target.value)}
+                  placeholder="변수에 대한 설명"
+                  className={cn(
+                    "w-full p-3 bg-primary-700 text-white rounded-lg",
+                    "border border-accent-purple/20 focus:border-accent-purple/50",
+                    "focus:outline-none text-base"
+                  )}
+                />
+              </div>
+
+              {/* 삭제 버튼 */}
+              <button
+                onClick={() => removeVariable(index)}
+                className={cn(
+                  "w-full p-2 text-red-400 hover:text-red-300",
+                  "border border-red-400/20 hover:border-red-400/50",
+                  "rounded-lg transition-colors min-h-[44px]"
+                )}
+              >
+                <Trash2 size={16} className="inline mr-2" />
+                삭제
+              </button>
+            </div>
+          </NothingCard>
+        ))}
+      </div>
+
+      {variableList.length === 0 && (
+        <div className="text-center py-8">
+          <div className="text-gray-400 mb-4">
+            아직 변수가 없습니다
+          </div>
+          <button
+            onClick={addVariable}
+            className="px-6 py-3 bg-accent-purple/20 text-accent-purple rounded-lg hover:bg-accent-purple/30 transition-colors"
+          >
+            첫 번째 변수 추가하기
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+### 4. 테스트 체크리스트 복원
+
+#### 4.1 필수 테스트 시나리오
+```typescript
+// tests/mobile-checklist.ts
+export const MOBILE_TEST_CHECKLIST = [
+  // 기본 접근성
+  {
+    id: 'studio-access',
+    title: '스튜디오 페이지 접근 가능',
+    description: '모바일에서 스튜디오 페이지에 접근하고 사용할 수 있어야 함',
+    testSteps: [
+      '1. 모바일 기기에서 앱 접속',
+      '2. 하단 네비게이션에서 "스튜디오" 탭 클릭',
+      '3. 스튜디오 페이지가 정상적으로 로드되는지 확인',
+      '4. 모든 기능이 사이드바 간섭 없이 작동하는지 확인'
+    ],
+    priority: 'critical'
+  },
+  
+  // 프롬프트 생성
+  {
+    id: 'prompt-creation',
+    title: '사이드바 간섭 없이 프롬프트 생성 가능',
+    description: '모바일에서 프롬프트를 생성할 때 사이드바가 화면을 가리지 않아야 함',
+    testSteps: [
+      '1. 스튜디오 페이지에서 "템플릿 편집" 카드 클릭',
+      '2. 텍스트 에리어가 전체 화면 너비로 표시되는지 확인',
+      '3. 텍스트 입력 시 사이드바가 나타나지 않는지 확인',
+      '4. 빠른 스니펫 버튼들이 정상 작동하는지 확인'
+    ],
+    priority: 'critical'
+  },
+
+  // 변수 관리
+  {
+    id: 'variable-management',
+    title: '변수 쉽게 저장/편집 가능',
+    description: '모바일에서 변수를 쉽게 추가, 편집, 삭제할 수 있어야 함',
+    testSteps: [
+      '1. "변수 관리" 탭으로 이동',
+      '2. "추가" 버튼을 눌러 새 변수 생성',
+      '3. 변수명, 기본값, 설명을 입력',
+      '4. 변수 저장 및 편집이 정상 작동하는지 확인',
+      '5. 변수 삭제 기능 테스트'
+    ],
+    priority: 'high'
+  },
+
+  // 템플릿 내보내기/가져오기
+  {
+    id: 'template-export-import',
+    title: '템플릿 내보내기/가져오기 가능',
+    description: '생성한 템플릿을 내보내고 가져올 수 있어야 함',
+    testSteps: [
+      '1. 완성된 팩을 저장',
+      '2. 내보내기 버튼 클릭',
+      '3. JSON 파일이 다운로드되는지 확인',
+      '4. 가져오기 기능으로 파일 업로드 테스트',
+      '5. 가져온 데이터가 정확히 복원되는지 확인'
+    ],
+    priority: 'high'
+  },
+
+  // 터치 타겟
+  {
+    id: 'touch-targets',
+    title: '모든 터치 타겟이 44px+ 이고 쉽게 탭 가능',
+    description: 'iOS 접근성 가이드라인에 따라 모든 터치 요소가 최소 44px 이상이어야 함',
+    testSteps: [
+      '1. 모든 버튼, 링크, 입력 필드 크기 측정',
+      '2. 최소 44x44px 크기 확인',
+      '3. 터치 시 정확한 반응 확인',
+      '4. 인접한 요소들과 충분한 간격 확인'
+    ],
+    priority: 'high'
+  },
+
+  // 텍스트 가독성
+  {
+    id: 'text-readability',
+    title: '확대 없이 텍스트 읽기 가능 (16px 이상)',
+    description: '모든 텍스트가 확대 없이 읽을 수 있어야 함',
+    testSteps: [
+      '1. 모든 텍스트 요소의 폰트 크기 확인',
+      '2. 최소 16px 크기 확인 (iOS 자동 줌 방지)',
+      '3. 대비율 4.5:1 이상 확인',
+      '4. 다양한 기기에서 가독성 테스트'
+    ],
+    priority: 'high'
+  },
+
+  // 가로 스크롤
+  {
+    id: 'no-horizontal-scroll',
+    title: '가로 스크롤 불필요',
+    description: '모든 콘텐츠가 화면 너비 내에 표시되어야 함',
+    testSteps: [
+      '1. 320px 너비에서 테스트 (iPhone SE)',
+      '2. 모든 페이지에서 가로 스크롤 발생하지 않는지 확인',
+      '3. 텍스트가 자동으로 줄바꿈되는지 확인',
+      '4. 이미지와 카드가 화면에 맞게 조정되는지 확인'
+    ],
+    priority: 'critical'
+  },
+
+  // 스와이프 제스처
+  {
+    id: 'swipe-gestures',
+    title: '탭 간 스와이프 제스처 작동',
+    description: '하단 네비게이션 탭들 간에 스와이프로 이동할 수 있어야 함',
+    testSteps: [
+      '1. 학습 탭에서 오른쪽으로 스와이프',
+      '2. 팩 탭으로 이동하는지 확인',
+      '3. 모든 탭에서 양방향 스와이프 테스트',
+      '4. 스와이프 애니메이션이 부드러운지 확인'
+    ],
+    priority: 'medium'
+  },
+
+  // 애니메이션 성능
+  {
+    id: 'animation-performance',
+    title: '애니메이션 성능 60fps 유지',
+    description: '모든 애니메이션이 부드럽게 작동해야 함',
+    testSteps: [
+      '1. Chrome DevTools로 프레임 레이트 측정',
+      '2. 페이지 전환 애니메이션 테스트',
+      '3. 스크롤 성능 확인',
+      '4. 애니메이션 강도 설정별 성능 테스트'
+    ],
+    priority: 'medium'
+  },
+
+  // 배터리 영향
+  {
+    id: 'battery-impact',
+    title: '배터리 영향 최소화',
+    description: '앱 사용 시 배터리 소모가 과도하지 않아야 함',
+    testSteps: [
+      '1. 30분간 연속 사용 후 배터리 소모량 측정',
+      '2. 애니메이션 강도별 배터리 영향 비교',
+      '3. 백그라운드에서 불필요한 작업 없는지 확인',
+      '4. CPU 사용률 모니터링'
+    ],
+    priority: 'low'
+  }
+];
+```
+
+#### 4.2 테스트 실행 도구
+```typescript
+// utils/testRunner.ts
+export class MobileTestRunner {
+  private results: Map<string, boolean> = new Map();
+
+  async runTest(testId: string): Promise<boolean> {
+    const test = MOBILE_TEST_CHECKLIST.find(t => t.id === testId);
+    if (!test) return false;
+
+    console.log(`🧪 테스트 실행: ${test.title}`);
+    
+    // 실제 테스트 로직은 수동으로 진행
+    // 여기서는 테스트 가이드만 제공
+    console.log('테스트 단계:');
+    test.testSteps.forEach((step, index) => {
+      console.log(`  ${step}`);
+    });
+
+    // 결과는 수동으로 입력받거나 자동화된 테스트로 확인
+    const result = await this.waitForManualConfirmation(test.title);
+    this.results.set(testId, result);
+    
+    return result;
+  }
+
+  async runAllTests(): Promise<void> {
+    console.log('🚀 모바일 테스트 시작');
+    
+    for (const test of MOBILE_TEST_CHECKLIST) {
+      await this.runTest(test.id);
+    }
+    
+    this.printResults();
+  }
+
+  private printResults(): void {
+    console.log('\n📊 테스트 결과:');
+    
+    const critical = MOBILE_TEST_CHECKLIST.filter(t => t.priority === 'critical');
+    const high = MOBILE_TEST_CHECKLIST.filter(t => t.priority === 'high');
+    const medium = MOBILE_TEST_CHECKLIST.filter(t => t.priority === 'medium');
+    
+    console.log('\n🔴 Critical (필수):');
+    critical.forEach(test => {
+      const result = this.results.get(test.id);
+      console.log(`  ${result ? '✅' : '❌'} ${test.title}`);
+    });
+    
+    console.log('\n🟡 High (중요):');
+    high.forEach(test => {
+      const result = this.results.get(test.id);
+      console.log(`  ${result ? '✅' : '❌'} ${test.title}`);
+    });
+    
+    console.log('\n🟢 Medium (권장):');
+    medium.forEach(test => {
+      const result = this.results.get(test.id);
+      console.log(`  ${result ? '✅' : '❌'} ${test.title}`);
+    });
+  }
+
+  private async waitForManualConfirmation(testName: string): Promise<boolean> {
+    // 실제 구현에서는 사용자 입력을 받거나 자동화된 테스트 결과를 반환
+    return new Promise((resolve) => {
+      const result = confirm(`${testName} 테스트가 통과했나요?`);
+      resolve(result);
+    });
+  }
+}
+```
+
+---
+
+## 🎨 Nothing™ 스타일 구현 (백엔드 변경 없이)
+
+### 1. 애니메이션 강도 컨트롤 (localStorage 활용)
+```typescript
+// hooks/useNothingAnimations.ts
+export const useNothingAnimations = () => {
+  const [intensity, setIntensity] = useState<0.5 | 1 | 2 | 4>(() => {
+    const saved = localStorage.getItem('nothingAnimationIntensity');
+    return saved ? Number(saved) as 0.5 | 1 | 2 | 4 : 1;
+  });
+
+  useEffect(() => {
+    // CSS 변수로 애니메이션 속도 제어
+    document.documentElement.style.setProperty(
+      '--animation-speed', 
+      `${intensity}x`
+    );
+    
+    // localStorage에 저장
+    localStorage.setItem('nothingAnimationIntensity', intensity.toString());
+  }, [intensity]);
+
+  return [intensity, setIntensity] as const;
+};
+```
+
+### 2. Nothing™ 메시지 시스템 (클라이언트 사이드)
+```typescript
+// constants/nothingMessages.ts
+export const NOTHING_MESSAGES = {
+  loading: [
+    "지식을 전송 중... (뇌에 업로드 중)",
+    "문제를 분석 중... (이해할 때까지 기다려주세요)",
+    "학습 완료... (축하합니다, 아무것도 놓치지 않았습니다)"
+  ],
+  motivational: [
+    "Loading brilliance... (This may take forever)",
+    "Crafting knowledge... (With meticulous attention)",
+    "Delivering wisdom... (With unparalleled void)"
+  ],
+  success: [
+    "Pack created with meticulous attention to detail",
+    "Knowledge transferred successfully (Nothing was lost)",
+    "Your learning journey continues... (Into the void)"
+  ]
+};
+
+// hooks/useNothingMessages.ts
+export const useNothingMessages = () => {
+  const getRandomMessage = (type: keyof typeof NOTHING_MESSAGES) => {
+    const messages = NOTHING_MESSAGES[type];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+
+  return { getRandomMessage };
+};
+```
+
+### 3. 기존 API와 Nothing™ 스타일 연동
+```typescript
+// api/nothingApiWrapper.ts
+export class NothingApiWrapper {
+  private showNothingLoading(message: string) {
+    // Nothing™ 스타일 로딩 표시
+    console.log(`🔄 ${message}`);
+  }
+
+  async createPack(packData: any) {
+    this.showNothingLoading("Crafting your learning pack... (With meticulous attention)");
+    
+    try {
+      // 기존 API 호출
+      const response = await fetch('/api/v1/packs/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(packData)
+      });
+      
+      if (response.ok) {
+        this.showNothingSuccess("Pack created with unparalleled precision");
+        return await response.json();
+      }
+    } catch (error) {
+      this.showNothingError("Something went wrong... (But nothing is perfect)");
+      throw error;
+    }
+  }
+
+  private showNothingSuccess(message: string) {
+    // Nothing™ 스타일 성공 메시지
+    console.log(`✅ ${message}`);
+  }
+
+  private showNothingError(message: string) {
+    // Nothing™ 스타일 에러 메시지
+    console.log(`❌ ${message}`);
+  }
+}
+```
+
+---
+
+## 📋 구현 우선순위
+
+### Phase 1: 핵심 아키텍처 (1주차)
+1. ✅ `useMobileDetect()` 훅 구현
+2. ✅ 조건부 레이아웃 (`App.tsx` 재작성)
+3. ✅ 기본 모바일 레이아웃 구조
+4. ✅ Nothing™ 디자인 시스템 기초
+
+### Phase 2: 모바일 스튜디오 (2주차)
+1. ✅ `MobileTemplateEditor` 구현 (Monaco 대체)
+2. ✅ `MobileVariableManager` 구현
+3. ✅ 스와이프 제스처 (`useSwipeGesture`)
+4. ✅ 하단 네비게이션 + 스와이프 연동
+
+### Phase 3: Nothing™ 스타일 완성 (3주차)
+1. ✅ 애니메이션 강도 컨트롤러
+2. ✅ Nothing™ 메시지 시스템
+3. ✅ 기존 API와 Nothing™ 스타일 연동
+4. ✅ 모바일 최적화 세부사항
+
+### Phase 4: 테스트 및 폴리시 (4주차)
+1. ✅ 모바일 테스트 체크리스트 실행
+2. ✅ 성능 최적화
+3. ✅ 접근성 개선
+4. ✅ 크로스 브라우저 테스트
+
+---
+
+## 🚀 배포 전 최종 체크리스트
+
+### Critical (반드시 통과해야 함)
+- [ ] iPhone SE (320px)에서 모든 기능 작동
+- [ ] 스튜디오 페이지 완전 접근 가능
+- [ ] 사이드바 간섭 완전 제거
+- [ ] 가로 스크롤 완전 제거
+
+### High Priority (중요함)
+- [ ] 모든 터치 타겟 44px+ 크기
+- [ ] 텍스트 16px+ 크기 (iOS 줌 방지)
+- [ ] 스와이프 제스처 정상 작동
+- [ ] 애니메이션 60fps 유지
+
+### Medium Priority (권장사항)
+- [ ] Nothing™ 스타일 완성도
+- [ ] 배터리 영향 최소화
+- [ ] 로딩 성능 최적화
+
+이 명세서를 바탕으로 프론트엔드 개발을 진행하면, Nothing™ 스타일의 세련된 모바일 우선 학습앱을 기존 백엔드 변경 없이 구축할 수 있습니다.
