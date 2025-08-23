@@ -147,42 +147,94 @@ export default function Studio() {
                 <textarea
                   value={markdownContent}
                   onChange={(e) => setMarkdownContent(e.target.value)}
-                  placeholder={`# 학습 목표
-이 단원에서는 다음을 배웁니다:
-- 핵심 개념 1
-- 핵심 개념 2
+                  placeholder={`# Role
+You are an expert educational content creator specializing in creating engaging and effective learning materials.
 
-## 내용
+## Task
+Create comprehensive learning content that helps students master [specific topic/skill].
 
-### 1. 소개
-내용을 작성하세요...
+## Context
+- Target audience: [beginner/intermediate/advanced] learners
+- Learning objective: [specific goal students should achieve]
+- Time constraint: [expected completion time]
+- Prerequisites: [required background knowledge]
 
-### 2. 실습
+## Content Structure
+
+### Introduction
+- Hook: Start with engaging question or real-world example
+- Learning objectives: Clear, measurable outcomes
+- Overview: Brief roadmap of what will be covered
+
+### Core Content
+#### Section 1: [Topic Name]
+Explanation with examples:
 \`\`\`javascript
-// 코드 예제
-console.log("Hello World");
+// Practical code examples
+console.log("Learning by doing");
 \`\`\`
 
-## 퀴즈
-1. 질문을 작성하세요?
-   - A) 선택지 1
-   - B) 선택지 2
+#### Section 2: [Next Topic]
+Step-by-step breakdown with visual aids
 
-## 정리
-학습한 내용을 정리해보세요.`}
+### Practice & Application
+- Hands-on exercises
+- Real-world scenarios
+- Self-check questions
+
+## Assessment
+1. **Knowledge Check**: [Question type]
+   - A) Option 1
+   - B) Option 2
+   - C) Option 3
+   - D) Option 4
+
+2. **Application Task**: [Practical exercise]
+
+# Rules
+- Use clear, simple language appropriate for target level
+- Include practical examples for every concept
+- Provide immediate feedback opportunities
+- Cross-reference related concepts
+- Validate accuracy of all technical information
+
+## Stop Conditions
+- All learning objectives are addressed
+- Content fits within specified time frame
+- Assessment aligns with objectives
+- Prerequisites are clearly stated
+
+## Output Format
+- Use proper markdown hierarchy (# ## ###)
+- Include code blocks with syntax highlighting
+- Add interactive elements where possible
+- Provide summary and next steps`}
                   rows={20}
                   className="w-full p-4 bg-primary-700 text-white placeholder-gray-400 rounded-xl border border-accent-purple/20 focus:outline-none focus:ring-2 focus:ring-accent-purple/50 font-mono text-sm resize-none"
                   data-testid="input-markdown"
                 />
                 <div className="mt-3 text-xs text-gray-400">
-                  <p className="mb-1">💡 <strong>마크다운 팁:</strong></p>
-                  <ul className="space-y-1 ml-4">
-                    <li>• <code># 제목</code> - 대제목</li>
-                    <li>• <code>## 부제목</code> - 소제목</li>
-                    <li>• <code>**굵은글씨**</code> - 강조</li>
-                    <li>• <code>`코드`</code> - 인라인 코드</li>
-                    <li>• <code>```언어</code> - 코드 블록</li>
-                  </ul>
+                  <p className="mb-2">💡 <strong>GPT-5 최적화 프롬프트 구조:</strong></p>
+                  <div className="grid grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <p className="text-accent-purple font-medium mb-1">필수 섹션:</p>
+                      <ul className="space-y-1">
+                        <li>• <code># Role</code> - "You are..." 로 시작</li>
+                        <li>• <code>## Task</code> - 구체적 과제</li>
+                        <li>• <code>## Context</code> - 배경 정보</li>
+                        <li>• <code># Rules</code> - 제약 조건</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="text-accent-blue font-medium mb-1">마크다운 문법:</p>
+                      <ul className="space-y-1">
+                        <li>• <code>**굵게**</code> - 강조</li>
+                        <li>• <code>`코드`</code> - 인라인</li>
+                        <li>• <code>```js</code> - 코드블록</li>
+                        <li>• <code>- 항목</code> - 리스트</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </NothingCard>

@@ -1,0 +1,53 @@
+The Anatomy of a GPT-5 Prompt — And How to Make It Even Better
+
+This breakdown from OpenAI of a GPT-5 prompt nails the essentials:
+
+Role
+Task
+Context
+Reasoning
+Output format
+Stop conditions
+
+AI is power and I love to compare it to Water.  Rain falling on rock cannot break or do any damage, but that same substance of water, FOCUSED in 60,000 PSI water cutter, can cut through granite. Same water, only difference is focus.
+
+Here is what I would do to make this prompt more focused and perform better.
+
+It’s a great foundation, but here’s how to level it up for GPT-5 performance based on OpenAI's Own guide and from research:
+
+1. Use “You are” instead of “Act as”
+Direct identity framing anchors the model’s behavior better. There is a difference between saying, "Act As" vs "You Are"
+❌ Act as an expert travel guide…
+✅ You are an expert travel guide…
+
+2. Add clear section headers (Markdown #=H1, ##=H2 and AI understands that hierarchy and therefore the logic behind each one's size difference)
+Structure matters. Use:
+# Role  
+## Task  
+## Context  
+## Reasoning  
+# Rules  
+## Stop Conditions 
+## Output Format   
+This makes instructions easy for GPT-5 to follow and reference.
+
+3. Include a “Rules” section
+Spell out non-negotiables, for example:
+# Rules  
+- Exclude extremely popular hikes.  
+- Cross-check against official listings.  
+- Use realistic distance/time data.  
+
+4. Separate reasoning from output
+Keep thinking instructions (validation, research steps) separate from formatting instructions so GPT-5 doesn’t blend them together.
+
+Why this works for GPT-5 (per the GPT-5 Prompting Guide):
+
+Clear role definition locks in persona.
+Specific constraints improve accuracy.
+Step-by-step checklist gives GPT-5 a process to follow.
+Context grounding narrows the search space for better precision.
+Structured output makes results predictable and easy to reuse.
+Stop conditions tell the model when it’s done.
+
+If you want GPT-5 to consistently deliver the right output.  If you want more help, I released the GPT5 Prompting guide for GTM last week and happy to send it to you, comment GPT5 and I will send it over.

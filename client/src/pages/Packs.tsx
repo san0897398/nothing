@@ -185,16 +185,18 @@ export default function Packs() {
           <Star className="mr-2 text-accent-warning" size={20} />
           인기 학습팩
         </h2>
-        <div className="flex space-x-4 overflow-x-auto pb-4">
+        <div className="flex space-x-4 overflow-x-auto pb-4 px-2">
           {popularPacks.map((pack) => (
             <div key={pack.id} className="flex-shrink-0 w-64">
-              <NothingCard
-                title={pack.title}
-                subtitle={pack.description}
-                icon={<span className="text-lg">{getPackIcon(pack.category)}</span>}
-                onTap={() => console.log('Popular pack selected:', pack.id)}
-                data-testid={`popular-pack-${pack.id}`}
-              >
+              <div className="transform hover:scale-105 transition-transform duration-300 origin-center">
+                <NothingCard
+                  title={pack.title}
+                  subtitle={pack.description}
+                  icon={<span className="text-lg">{getPackIcon(pack.category)}</span>}
+                  onTap={() => console.log('Popular pack selected:', pack.id)}
+                  data-testid={`popular-pack-${pack.id}`}
+                  className="hover:scale-100"
+                >
                 <div className="flex items-center justify-between text-xs text-gray-500">
                   <span className="flex items-center">
                     <Clock size={10} className="mr-1" />
@@ -205,7 +207,8 @@ export default function Packs() {
                     {pack.rating}
                   </span>
                 </div>
-              </NothingCard>
+                </NothingCard>
+              </div>
             </div>
           ))}
         </div>
