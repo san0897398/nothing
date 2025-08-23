@@ -198,9 +198,9 @@ export default function Packs() {
           <span className="text-white">Popular</span>
           <span className="text-transparent bg-gradient-to-r from-accent-warning to-accent-purple bg-clip-text ml-2"> Learning™</span>
         </h2>
-        <div className="flex space-x-4 overflow-x-auto pb-4 px-2">
+        <div className="flex space-x-3 overflow-x-auto pb-4 px-1 scrollbar-hide" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
           {popularPacks.map((pack) => (
-            <div key={pack.id} className="flex-shrink-0 w-60">
+            <div key={pack.id} className="flex-shrink-0 w-52">
               <div className="gradient-glow click-effect">
                 <NothingCard
                   title={pack.title}

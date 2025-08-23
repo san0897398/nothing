@@ -189,14 +189,14 @@ function ChatInput({
   disabled?: boolean;
 }) {
   return (
-    <div className="p-4 bg-slate-900/90 backdrop-blur-sm border-t border-purple-500/10 mobile-safe-area">
+    <div className="p-4 bg-gradient-to-r from-primary-900/95 via-primary-800/95 to-primary-900/95 backdrop-blur-xl border-t border-accent-purple/20 mobile-safe-area">
       <div className="flex items-end space-x-3">
         <button
           onClick={onToggleFileInput}
-          className={`p-3 rounded-full transition-all ${
+          className={`p-3 rounded-full transition-all duration-300 ${
             showFileInput
-              ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/30'
-              : 'bg-slate-700 text-gray-400 hover:bg-slate-600'
+              ? 'bg-gradient-to-br from-accent-purple to-accent-blue text-white shadow-lg shadow-accent-purple/30'
+              : 'bg-primary-700 text-gray-400 hover:bg-accent-purple/20 hover:text-accent-purple'
           }`}
           data-testid="button-file-input"
         >
@@ -209,7 +209,7 @@ function ChatInput({
             onChange={(e) => onMessageChange(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="메시지를 입력하세요..."
-            className="w-full p-4 pr-12 bg-slate-800 text-white placeholder-gray-400 rounded-2xl border border-purple-500/20 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none mobile-text-base"
+            className="w-full p-4 pr-14 bg-primary-800/50 text-white placeholder-gray-400 rounded-2xl border border-accent-purple/30 focus:outline-none focus:ring-2 focus:ring-accent-purple/50 resize-none mobile-text-base"
             style={{ fontSize: '16px' }}
             rows={1}
             disabled={disabled}
@@ -219,7 +219,7 @@ function ChatInput({
           <button
             onClick={onSendMessage}
             disabled={disabled || !message.trim()}
-            className="absolute right-2 bottom-2 p-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="absolute right-3 bottom-3 p-3 bg-gradient-to-r from-accent-purple to-accent-blue text-white rounded-full hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-accent-purple/30"
             data-testid="button-send"
           >
             <Send size={16} />
