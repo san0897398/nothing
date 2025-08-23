@@ -27,9 +27,28 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-primary-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-accent-purple/30 border-t-accent-purple rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white font-medium">경험을 로딩 중...</p>
-          <p className="text-gray-400 text-sm">잠시만 기다려주세요</p>
+          {/* Nothing™ Loading Animation */}
+          <div className="relative w-20 h-20 mx-auto mb-8">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-accent-purple via-accent-blue to-accent-glow opacity-20 animate-ping"></div>
+            <div className="relative w-full h-1 bg-primary-700 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-accent-purple to-accent-blue animate-pulse rounded-full"></div>
+            </div>
+          </div>
+          
+          <h2 className="text-2xl font-bold mb-2">
+            <span className="text-white">Loading</span>
+            <span className="text-transparent bg-gradient-to-r from-accent-purple to-accent-blue bg-clip-text"> Experience™</span>
+          </h2>
+          
+          <p className="text-gray-400 text-sm mb-4">
+            Nothing™ 시스템 초기화 중...
+          </p>
+          
+          <div className="flex items-center justify-center space-x-1">
+            <div className="w-1 h-1 rounded-full bg-accent-purple animate-bounce" style={{animationDelay: '0s'}}></div>
+            <div className="w-1 h-1 rounded-full bg-accent-blue animate-bounce" style={{animationDelay: '0.1s'}}></div>
+            <div className="w-1 h-1 rounded-full bg-accent-glow animate-bounce" style={{animationDelay: '0.2s'}}></div>
+          </div>
         </div>
       </div>
     );

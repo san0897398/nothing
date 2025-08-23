@@ -52,24 +52,35 @@ export default function Studio() {
 
   return (
     <MobileLayout>
-      {/* Hero Section */}
-      <section className="px-4 py-8 text-center">
-        <div className="mb-6">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-accent-purple to-accent-blue flex items-center justify-center">
-            <FileText className="text-white" size={28} />
+      {/* Nothing™ Hero Section */}
+      <section className="px-4 py-12 text-center">
+        <div className="mb-8">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-3xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-accent-purple via-accent-blue to-accent-glow animate-pulse"></div>
+            <div className="relative w-full h-full flex items-center justify-center backdrop-blur-sm">
+              <FileText className="text-white drop-shadow-lg" size={36} />
+            </div>
           </div>
         </div>
         
-        <h1 className="hero-title mb-4">
-          <span className="text-white">Create</span>
+        <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <span className="text-white">Create Your</span>
           <br />
-          <span className="gradient-text">Learning Content™</span>
+          <span className="text-transparent bg-gradient-to-r from-accent-purple via-accent-blue to-accent-glow bg-clip-text">
+            Learning Pack™
+          </span>
         </h1>
         
-        <p className="text-gray-400 mobile-text-base leading-relaxed max-w-sm mx-auto mb-8">
-          마크다운으로 간단하게 학습 콘텐츠를 만들어보세요.
-          AI와 협업하며 더 나은 자료를 완성할 수 있습니다.
+        <p className="text-gray-400 text-lg leading-relaxed max-w-lg mx-auto mb-8 opacity-90">
+          Experience the profound power of educational content creation.
+          Crafted with meticulous attention to learning, delivered with
+          unparalleled pedagogical precision.
         </p>
+        
+        <div className="flex items-center justify-center space-x-2 text-sm text-accent-glow mb-8">
+          <div className="w-2 h-2 rounded-full bg-accent-purple animate-pulse"></div>
+          <span>AI 협업 시스템 활성화됨</span>
+        </div>
       </section>
 
       {/* Quick Actions */}

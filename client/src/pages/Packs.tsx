@@ -92,12 +92,24 @@ export default function Packs() {
 
   return (
     <MobileLayout>
-      {/* Header */}
-      <section className="px-4 py-6">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-white mb-2">학습 팩</h1>
-          <p className="text-gray-400 text-sm">
-            다양한 주제의 학습 콘텐츠를 탐색해보세요
+      {/* Nothing™ Header */}
+      <section className="px-4 py-8">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-2xl relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-accent-purple via-accent-blue to-accent-glow animate-pulse opacity-80"></div>
+            <div className="relative w-full h-full flex items-center justify-center">
+              <BookOpen className="text-white drop-shadow-lg" size={28} />
+            </div>
+          </div>
+          
+          <h1 className="text-3xl font-bold mb-3">
+            <span className="text-white">Discover</span>
+            <span className="text-transparent bg-gradient-to-r from-accent-purple to-accent-blue bg-clip-text"> Packs™</span>
+          </h1>
+          
+          <p className="text-gray-300 text-base opacity-90 max-w-sm mx-auto">
+            Experience curated learning collections.
+            AI가 추천하는 맞춤형 학습 여정을 시작하세요.
           </p>
         </div>
 
