@@ -170,10 +170,10 @@ export function ChatInterface() {
   }
 
   return (
-    <section className="px-4 mb-8">
-      <div className="nothing-card rounded-2xl overflow-hidden" data-testid="chat-interface">
+    <div className="flex flex-col h-full px-4">
+      <div className="nothing-card rounded-2xl overflow-hidden flex flex-col flex-1 min-h-0" data-testid="chat-interface">
         {/* Chat Header */}
-        <div className="p-4 border-b border-accent-purple/20">
+        <div className="p-4 border-b border-accent-purple/20 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent-purple to-accent-blue flex items-center justify-center">
               <Bot className="text-white" size={20} />
@@ -191,7 +191,7 @@ export function ChatInterface() {
         </div>
 
         {/* Chat Messages */}
-        <div className="p-4 space-y-4 max-h-64 overflow-y-auto">
+        <div className="p-4 space-y-4 flex-1 overflow-y-auto">
           {messages.length === 0 ? (
             <div className="text-center text-gray-400 py-8">
               <Bot className="mx-auto mb-4" size={32} />
@@ -224,7 +224,7 @@ export function ChatInterface() {
         </div>
 
         {/* Chat Input with Actions */}
-        <div className="p-4 border-t border-accent-purple/20">
+        <div className="p-4 border-t border-accent-purple/20 flex-shrink-0">
           {/* Action Buttons */}
           <div className="flex space-x-2 mb-4">
             <ObjectUploader
@@ -286,7 +286,7 @@ export function ChatInterface() {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 

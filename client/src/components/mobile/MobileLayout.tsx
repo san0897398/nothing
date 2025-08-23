@@ -51,7 +51,7 @@ export function MobileLayout({ children }: MobileLayoutProps) {
       </div>
 
       {/* Main Content */}
-      <main className="pb-24 mobile-safe-area">
+      <main className="pb-24 mobile-safe-area flex-1 flex flex-col min-h-0">
         {children}
       </main>
 
